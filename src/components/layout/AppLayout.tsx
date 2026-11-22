@@ -23,6 +23,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate, useNavigation } from "react-router";
+import logoMark from "@/assets/logo-mark.png";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useProfile } from "@/features/auth/useProfile";
 import { paths } from "@/routes/paths";
@@ -83,7 +84,15 @@ export function AppLayout() {
         trigger={null}
         className={styles.sider}
       >
-        <div className={styles.logo}>{collapsed ? "VRH" : "VACATION RENTAL"}</div>
+        <div className={styles.logo}>
+          {/* The name is shown as text when expanded; the image carries it when collapsed. */}
+          <img
+            src={logoMark}
+            alt={collapsed ? "Vacation Rental Hotline" : ""}
+            className={styles.logoMark}
+          />
+          {!collapsed && <span className={styles.logoText}>Vacation Rental Hotline</span>}
+        </div>
         <Menu
           theme="dark"
           mode="inline"

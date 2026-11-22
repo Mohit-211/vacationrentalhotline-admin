@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Button, Card, Form, Input, Typography } from "antd";
 import { Navigate, useLocation, type Location } from "react-router";
-import logo from "@/assets/vacation-logo.png";
+import logo from "@/assets/logo.png";
 import { paths } from "@/routes/paths";
 import { getErrorMessage, getErrorStatus } from "@/utils/errors";
 import { login, type LoginCredentials } from "../api";
