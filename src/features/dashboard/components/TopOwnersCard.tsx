@@ -20,7 +20,7 @@ const columns: TableProps<TopPropertyOwner>["columns"] = [
 
 export function TopOwnersCard({ owners, loading, error }: TopOwnersCardProps) {
   return (
-    <Card title="Top property owners" style={{ height: "100%" }}>
+    <Card title="Top property owners" className="card-fill">
       {error ? (
         <Typography.Text type="danger">Could not load property owners</Typography.Text>
       ) : (
@@ -30,8 +30,8 @@ export function TopOwnersCard({ owners, loading, error }: TopOwnersCardProps) {
           columns={columns}
           dataSource={owners}
           loading={loading}
-          pagination={false}
-          scroll={{ y: 260 }}
+          locale={{ emptyText: "No property owners yet" }}
+          pagination={{ pageSize: 5, size: "small", hideOnSinglePage: true }}
         />
       )}
     </Card>

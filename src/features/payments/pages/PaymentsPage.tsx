@@ -1,15 +1,22 @@
 import { ExportOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Input, Table, Tag, type TableProps } from "antd";
+import { Card, Input, Table, Tag, type TableProps } from "antd";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
-import { EMPTY_VALUE, displayValue, formatCurrency, formatDateTime } from "@/utils/format";
+import {
+  EMPTY_VALUE,
+  displayValue,
+  formatCurrency,
+  formatDateTime,
+  formatLabel,
+} from "@/utils/format";
 import { matchesQuery } from "@/utils/search";
 import { fetchPayments, paymentKeys } from "../api";
 import type { Payment } from "../types";
 
+/** Tag colours for the payment statuses the API sends; anything else shows as a neutral tag. */
 const STATUS_COLORS: Record<string, string> = {
   succeeded: "success",
   success: "success",
@@ -25,7 +32,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 function PaymentStatusTag({ status }: { status?: string | null }) {
   if (!status) return <>{EMPTY_VALUE}</>;
-  return <Tag color={STATUS_COLORS[status.toLowerCase()]}>{status}</Tag>;
+  return <Tag color={STATUS_COLORS[status.toLowerCase()]}>{formatLabel(status)}</Tag>;
 }
 
 const columns: TableProps<Payment>["columns"] = [
@@ -37,7 +44,7 @@ const columns: TableProps<Payment>["columns"] = [
     render: formatCurrency,
     sorter: (a, b) => Number(a.collectiveAmount ?? 0) - Number(b.collectiveAmount ?? 0),
   },
-  { title: "Method", dataIndex: "payment_mode", render: displayValue },
+  { title: "Method", dataIndex: "payment_mode", responsive: ["md"], render: formatLabel },
   {
     title: "Status",
     dataIndex: "payment_status",
@@ -46,6 +53,7 @@ const columns: TableProps<Payment>["columns"] = [
   {
     title: "Paid on",
     dataIndex: "created_at",
+    responsive: ["sm"],
     render: formatDateTime,
     defaultSortOrder: "descend",
     sorter: (a, b) => dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf(),
@@ -53,6 +61,7 @@ const columns: TableProps<Payment>["columns"] = [
   {
     title: "Receipt",
     dataIndex: "receipt_url",
+    responsive: ["md"],
     render: (url?: string | null) =>
       url ? (
         <a href={url} target="_blank" rel="noopener noreferrer">
@@ -87,26 +96,28 @@ export function PaymentsPage() {
             placeholder="Search user"
             aria-label="Search payments"
             onChange={(event) => setSearch(event.target.value)}
-            style={{ width: 240 }}
+            className="toolbar-search"
           />
         }
       />
-      {paymentsQuery.error ? (
-        <QueryErrorResult error={paymentsQuery.error} onRetry={() => paymentsQuery.refetch()} />
-      ) : (
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={payments}
-          loading={paymentsQuery.isPending}
-          pagination={{
-            pageSize: 20,
-            showSizeChanger: true,
-            showTotal: (total) => `${total} payments`,
-          }}
-          scroll={{ x: "max-content" }}
-        />
-      )}
+      <Card>
+        {paymentsQuery.error ? (
+          <QueryErrorResult error={paymentsQuery.error} onRetry={() => paymentsQuery.refetch()} />
+        ) : (
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={payments}
+            loading={paymentsQuery.isPending}
+            pagination={{
+              pageSize: 20,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} payments`,
+            }}
+            scroll={{ x: "max-content" }}
+          />
+        )}
+      </Card>
     </>
   );
 }

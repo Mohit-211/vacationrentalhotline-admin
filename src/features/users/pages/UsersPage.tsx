@@ -1,16 +1,16 @@
 import {
   CheckCircleFilled,
-  CloseCircleFilled,
   DownloadOutlined,
-  EyeOutlined,
+  ExclamationCircleFilled,
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Space, Table, Tooltip, theme, type TableProps } from "antd";
+import { App, Button, Card, Flex, Input, Table, Tooltip, Typography, type TableProps } from "antd";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { DeleteButton } from "@/components/DeleteButton";
 import { PageHeader } from "@/components/PageHeader";
+import { TruncatedText } from "@/components/TruncatedText";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
 import { paths } from "@/routes/paths";
 import { downloadCsv } from "@/utils/csv";
@@ -45,63 +45,55 @@ export function UsersPage() {
   });
 
   const columns: TableProps<User>["columns"] = [
+    // Name (linking to the user's page) over email: one narrow column that also fits phones.
     {
-      title: "Name",
-      key: "name",
-      render: (_, user) => displayValue(user.user_profile?.name),
+      title: "User",
+      key: "user",
       sorter: (a, b) => (a.user_profile?.name ?? "").localeCompare(b.user_profile?.name ?? ""),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      render: (email: string, user) => (
-        <Space size={6}>
-          {email}
-          <VerifiedIcon verified={Boolean(user.is_verified)} />
-        </Space>
-      ),
+      render: (_, user) => {
+        const name = user.user_profile?.name;
+        return (
+          <Flex vertical>
+            <Link to={paths.user(user.id)}>{name || user.email}</Link>
+            <Flex align="center" gap="small">
+              {name && <Typography.Text type="secondary">{user.email}</Typography.Text>}
+              <VerifiedIcon verified={Boolean(user.is_verified)} />
+            </Flex>
+          </Flex>
+        );
+      },
     },
     {
       title: "Mobile",
       key: "mobile",
+      responsive: ["lg"],
       render: (_, user) => displayValue(user.user_profile?.mobile),
     },
     {
       title: "Address",
       key: "address",
-      ellipsis: true,
-      render: (_, user) => displayValue(user.user_profile?.full_address),
+      responsive: ["lg"],
+      render: (_, user) => <TruncatedText text={user.user_profile?.full_address} />,
     },
     {
       title: "Properties",
       dataIndex: "active_property_count",
       align: "right",
+      responsive: ["md"],
       sorter: (a, b) => (a.active_property_count ?? 0) - (b.active_property_count ?? 0),
       render: (count?: number | null) => formatNumber(count ?? 0),
     },
     {
       title: "Actions",
       key: "actions",
-      width: 110,
-      render: (_, user) => {
-        const name = user.user_profile?.name || user.email;
-        return (
-          <Space>
-            <Tooltip title="View details">
-              <Button
-                icon={<EyeOutlined />}
-                aria-label={`View ${name}`}
-                onClick={() => navigate(paths.user(user.id))}
-              />
-            </Tooltip>
-            <DeleteButton
-              itemName={name}
-              loading={deleteMutation.isPending && deleteMutation.variables === user.id}
-              onConfirm={() => deleteMutation.mutate(user.id)}
-            />
-          </Space>
-        );
-      },
+      // The name in the User column opens the user's page, so delete is the only action here.
+      render: (_, user) => (
+        <DeleteButton
+          itemName={user.user_profile?.name || user.email}
+          loading={deleteMutation.isPending && deleteMutation.variables === user.id}
+          onConfirm={() => deleteMutation.mutate(user.id)}
+        />
+      ),
     },
   ];
 
@@ -132,7 +124,7 @@ export function UsersPage() {
               placeholder="Search name or email"
               aria-label="Search users"
               onChange={(event) => setSearch(event.target.value)}
-              style={{ width: 240 }}
+              className="toolbar-search"
             />
             <Button icon={<DownloadOutlined />} onClick={exportUsers} disabled={!users.length}>
               Export CSV
@@ -143,36 +135,36 @@ export function UsersPage() {
           </>
         }
       />
-      {usersQuery.error ? (
-        <QueryErrorResult error={usersQuery.error} onRetry={() => usersQuery.refetch()} />
-      ) : (
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={users}
-          loading={usersQuery.isPending}
-          pagination={{
-            pageSize: 20,
-            showSizeChanger: true,
-            showTotal: (total) => `${total} users`,
-          }}
-          scroll={{ x: "max-content" }}
-        />
-      )}
+      <Card>
+        {usersQuery.error ? (
+          <QueryErrorResult error={usersQuery.error} onRetry={() => usersQuery.refetch()} />
+        ) : (
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={users}
+            loading={usersQuery.isPending}
+            pagination={{
+              pageSize: 20,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} users`,
+            }}
+            scroll={{ x: "max-content" }}
+          />
+        )}
+      </Card>
     </>
   );
 }
 
+/** Green check for a verified email; amber exclamation when the user has not verified it yet. */
 function VerifiedIcon({ verified }: { verified: boolean }) {
-  const { token } = theme.useToken();
   const label = verified ? "Email verified" : "Email not verified";
   return (
     <Tooltip title={label}>
-      {verified ? (
-        <CheckCircleFilled style={{ color: token.colorSuccess }} aria-label={label} />
-      ) : (
-        <CloseCircleFilled style={{ color: token.colorError }} aria-label={label} />
-      )}
+      <Typography.Text type={verified ? "success" : "warning"} role="img" aria-label={label}>
+        {verified ? <CheckCircleFilled /> : <ExclamationCircleFilled />}
+      </Typography.Text>
     </Tooltip>
   );
 }

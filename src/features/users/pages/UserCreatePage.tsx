@@ -35,11 +35,10 @@ export function UserCreatePage() {
   return (
     <>
       <PageHeader title="Add user" subtitle="Create an app account for someone" onBack={goToList} />
-      <Card>
+      <Card className="form-card">
         <Form<NewUserValues>
           layout="vertical"
           requiredMark={false}
-          style={{ maxWidth: 560 }}
           onFinish={(values) => createMutation.mutate(values)}
         >
           <Form.Item

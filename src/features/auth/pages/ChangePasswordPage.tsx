@@ -1,14 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { App, Card, Form, Input } from "antd";
-import { useNavigate } from "react-router";
 import { FormActions } from "@/components/FormActions";
 import { PageHeader } from "@/components/PageHeader";
+import { paths } from "@/routes/paths";
+import { useGoBack } from "@/routes/useGoBack";
 import { getErrorMessage } from "@/utils/errors";
 import { changePassword, type ChangePasswordValues } from "../api";
 
 export function ChangePasswordPage() {
   const [form] = Form.useForm<ChangePasswordValues>();
-  const navigate = useNavigate();
+  const goBack = useGoBack(paths.profile);
   const { message } = App.useApp();
   const changeMutation = useMutation({
     mutationFn: changePassword,
@@ -22,12 +23,11 @@ export function ChangePasswordPage() {
   return (
     <>
       <PageHeader title="Change password" subtitle="Update the password you use to sign in" />
-      <Card>
+      <Card className="form-card">
         <Form<ChangePasswordValues>
           form={form}
           layout="vertical"
           requiredMark={false}
-          style={{ maxWidth: 480 }}
           onFinish={(values) => changeMutation.mutate(values)}
         >
           <Form.Item
@@ -72,7 +72,7 @@ export function ChangePasswordPage() {
           <FormActions
             submitLabel="Change password"
             submitting={changeMutation.isPending}
-            onCancel={() => navigate(-1)}
+            onCancel={goBack}
           />
         </Form>
       </Card>

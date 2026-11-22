@@ -13,20 +13,24 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, extra, onBack }: PageHeaderProps) {
   return (
-    <Flex justify="space-between" align="flex-start" gap="middle" wrap style={{ marginBottom: 24 }}>
+    <Flex className="page-header" justify="space-between" align="flex-start" gap="middle" wrap>
       <Flex align="flex-start" gap="small">
         {onBack && (
           <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack} aria-label="Go back" />
         )}
         <div>
-          <Typography.Title level={3} style={{ margin: 0 }}>
+          <Typography.Title level={1} className="page-header__title">
             {title}
           </Typography.Title>
-          {subtitle && <Typography.Text type="secondary">{subtitle}</Typography.Text>}
+          {subtitle && (
+            <Typography.Text type="secondary" className="page-header__subtitle">
+              {subtitle}
+            </Typography.Text>
+          )}
         </div>
       </Flex>
       {extra && (
-        <Flex gap="small" wrap align="center">
+        <Flex gap="small" wrap align="center" className="page-header__extra">
           {extra}
         </Flex>
       )}

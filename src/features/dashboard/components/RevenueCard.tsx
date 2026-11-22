@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, Empty, Select, Spin, Typography } from "antd";
+import { Card, Empty, Flex, Select, Spin, Typography } from "antd";
 import { lazy, Suspense, useState } from "react";
 import { dashboardKeys, fetchRevenueHistory } from "../api";
 import { REVENUE_PERIODS, type RevenuePeriod } from "../types";
@@ -8,7 +8,11 @@ const RevenueChart = lazy(() =>
   import("./RevenueChart").then((module) => ({ default: module.RevenueChart })),
 );
 
-const chartFallback = <Spin style={{ display: "block", padding: 120 }} />;
+const chartFallback = (
+  <Flex align="center" justify="center" className="chart-area">
+    <Spin />
+  </Flex>
+);
 
 /** Revenue for the chosen period, one column per time bucket. */
 export function RevenueCard() {
@@ -28,7 +32,7 @@ export function RevenueCard() {
           value={period}
           onChange={setPeriod}
           options={REVENUE_PERIODS.map((option) => ({ ...option }))}
-          style={{ width: 160 }}
+          className="toolbar-select"
         />
       }
     >

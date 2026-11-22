@@ -1,4 +1,4 @@
-import { Button, Result } from "antd";
+import { Button, Result, Typography } from "antd";
 import { isRouteErrorResponse, useRouteError } from "react-router";
 
 /** Shown when a page crashes or its code fails to load (for example right after a deploy). */
@@ -9,7 +9,11 @@ export function RouteErrorBoundary() {
   return (
     <Result
       status="error"
-      title="Something went wrong"
+      title={
+        <Typography.Title level={1} className="result-title">
+          Something went wrong
+        </Typography.Title>
+      }
       subTitle={
         isRouteErrorResponse(error)
           ? `${error.status} ${error.statusText}`

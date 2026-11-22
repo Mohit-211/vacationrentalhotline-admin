@@ -1,4 +1,4 @@
-import { CheckCircleFilled, DownloadOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, DownloadOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Card, Descriptions, Flex, Space, Tag } from "antd";
 import { useNavigate, useParams } from "react-router";
@@ -29,7 +29,9 @@ export function UserDetailsPage() {
     return (
       <>
         <PageHeader title="User" onBack={() => navigate(paths.users)} />
-        <QueryErrorResult error={userQuery.error} onRetry={() => userQuery.refetch()} />
+        <Card>
+          <QueryErrorResult error={userQuery.error} onRetry={() => userQuery.refetch()} />
+        </Card>
       </>
     );
   }
@@ -51,13 +53,18 @@ export function UserDetailsPage() {
                 key: "email",
                 label: "Email",
                 children: (
-                  <Space size={6}>
+                  <Space size="small" wrap>
                     {displayValue(user?.email)}
-                    {Boolean(user?.is_verified) && (
-                      <Tag icon={<CheckCircleFilled />} color="success">
-                        Verified
-                      </Tag>
-                    )}
+                    {user &&
+                      (user.is_verified ? (
+                        <Tag icon={<CheckCircleFilled />} color="success">
+                          Verified
+                        </Tag>
+                      ) : (
+                        <Tag icon={<ExclamationCircleFilled />} color="warning">
+                          Not verified
+                        </Tag>
+                      ))}
                   </Space>
                 ),
               },

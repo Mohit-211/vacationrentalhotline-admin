@@ -1,6 +1,6 @@
 import { DownloadOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Input } from "antd";
+import { Button, Card, Input } from "antd";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
@@ -39,7 +39,7 @@ export function PropertiesPage() {
               placeholder="Search owner, email or address"
               aria-label="Search properties"
               onChange={(event) => setSearch(event.target.value)}
-              style={{ width: 280 }}
+              className="toolbar-search"
             />
             <Button
               icon={<DownloadOutlined />}
@@ -51,11 +51,16 @@ export function PropertiesPage() {
           </>
         }
       />
-      {propertiesQuery.error ? (
-        <QueryErrorResult error={propertiesQuery.error} onRetry={() => propertiesQuery.refetch()} />
-      ) : (
-        <PropertiesTable properties={properties} loading={propertiesQuery.isPending} />
-      )}
+      <Card>
+        {propertiesQuery.error ? (
+          <QueryErrorResult
+            error={propertiesQuery.error}
+            onRetry={() => propertiesQuery.refetch()}
+          />
+        ) : (
+          <PropertiesTable properties={properties} loading={propertiesQuery.isPending} />
+        )}
+      </Card>
     </>
   );
 }

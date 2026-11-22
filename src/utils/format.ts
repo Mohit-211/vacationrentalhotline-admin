@@ -52,3 +52,15 @@ export function formatNumber(value: NumberInput): string {
 export function displayValue(value: string | number | null | undefined): string {
   return value === null || value === undefined || value === "" ? EMPTY_VALUE : String(value);
 }
+
+/**
+ * Codes from the API as readable labels: "ADMIN" -> "Admin", "bank_transfer" -> "Bank transfer",
+ * "succeeded" -> "Succeeded". Used for roles, payment statuses and payment methods.
+ */
+export function formatLabel(value: string | null | undefined): string {
+  const words = (value ?? "")
+    .trim()
+    .replace(/[_\s]+/g, " ")
+    .toLowerCase();
+  return words ? words[0].toUpperCase() + words.slice(1) : EMPTY_VALUE;
+}

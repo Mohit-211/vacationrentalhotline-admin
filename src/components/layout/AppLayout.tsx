@@ -2,9 +2,11 @@ import {
   ContactsOutlined,
   CreditCardOutlined,
   DashboardOutlined,
+  DownOutlined,
   KeyOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
+  MenuOutlined,
   MenuUnfoldOutlined,
   SafetyCertificateOutlined,
   TeamOutlined,
@@ -13,28 +15,32 @@ import {
 import {
   Avatar,
   Button,
+  Drawer,
   Dropdown,
-  Flex,
+  Grid,
   Layout,
   Menu,
   Spin,
   Typography,
   type MenuProps,
 } from "antd";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate, useNavigation } from "react-router";
 import logoMark from "@/assets/logo-mark-96.png";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useProfile } from "@/features/auth/useProfile";
 import { paths } from "@/routes/paths";
-import styles from "./AppLayout.module.css";
+import { layoutSizes } from "@/styles/theme";
+import { formatLabel } from "@/utils/format";
+
+const BRAND_NAME = "Vacation Rental Hotline";
 
 const NAV_ITEMS = [
   { path: paths.dashboard, label: "Dashboard", icon: <DashboardOutlined /> },
   { path: paths.users, label: "Users", icon: <TeamOutlined /> },
   { path: paths.payments, label: "Payments", icon: <CreditCardOutlined /> },
-  { path: paths.contact, label: "Contact", icon: <ContactsOutlined /> },
-  { path: paths.admins, label: "Access Management", icon: <SafetyCertificateOutlined /> },
+  { path: paths.contact, label: "Contact forms", icon: <ContactsOutlined /> },
+  { path: paths.admins, label: "Access management", icon: <SafetyCertificateOutlined /> },
 ];
 
 const MENU_ITEMS: MenuProps["items"] = NAV_ITEMS.map((item) => ({
@@ -50,14 +56,30 @@ function getSelectedKey(pathname: string): string | undefined {
     ?.path;
 }
 
+/** "Ada Lovelace" -> "AL", shown in the account avatar. */
+function getInitials(name: string | undefined): string {
+  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "A";
+  const first = words[0][0];
+  const last = words.length > 1 ? words[words.length - 1][0] : "";
+  return `${first}${last}`.toUpperCase();
+}
+
 export function AppLayout() {
+  // Below the md breakpoint (768px) the menu moves into a drawer so pages get the full width.
+  const isMobile = Grid.useBreakpoint().md === false;
   const [collapsed, setCollapsed] = useState(false);
+  // The drawer belongs to the page it was opened on, so it closes by itself after navigating.
+  const [menuOpenOn, setMenuOpenOn] = useState<string | null>(null);
+  const brandNameId = useId();
   const { pathname } = useLocation();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { data: profile } = useProfile();
   const selectedKey = getSelectedKey(pathname);
+  const showCollapsed = collapsed && !isMobile;
+  const closeMenu = () => setMenuOpenOn(null);
 
   const accountMenu: MenuProps = {
     items: [
@@ -73,58 +95,97 @@ export function AppLayout() {
     },
   };
 
-  return (
-    <Layout className={styles.root}>
-      <Layout.Sider
-        width={250}
-        breakpoint="lg"
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-        trigger={null}
-        className={styles.sider}
-      >
-        <div className={styles.logo}>
-          {/* The name is shown as text when expanded; the image carries it when collapsed. */}
-          <img
-            src={logoMark}
-            alt={collapsed ? "Vacation Rental Hotline" : ""}
-            className={styles.logoMark}
-          />
-          {!collapsed && <span className={styles.logoText}>Vacation Rental Hotline</span>}
-        </div>
+  const sidebarContent = (
+    <>
+      <div className={showCollapsed ? "app-brand app-brand--collapsed" : "app-brand"}>
+        {/* The name is shown as text when expanded; the image carries it when collapsed. */}
+        <img src={logoMark} alt={showCollapsed ? BRAND_NAME : ""} className="app-brand__mark" />
+        {!showCollapsed && (
+          <span id={brandNameId} className="app-brand__name">
+            {BRAND_NAME}
+          </span>
+        )}
+      </div>
+      <nav aria-label="Main">
         <Menu
-          theme="dark"
           mode="inline"
           items={MENU_ITEMS}
           selectedKeys={selectedKey ? [selectedKey] : []}
+          onClick={closeMenu}
+          className="app-menu"
         />
-      </Layout.Sider>
+      </nav>
+    </>
+  );
+
+  return (
+    <Layout className="app-shell">
+      {isMobile ? (
+        <Drawer
+          placement="left"
+          size={layoutSizes.siderWidth}
+          open={menuOpenOn === pathname}
+          onClose={closeMenu}
+          closable={false}
+          aria-labelledby={brandNameId}
+          classNames={{ body: "app-drawer__body" }}
+        >
+          {sidebarContent}
+        </Drawer>
+      ) : (
+        <Layout.Sider
+          theme="light"
+          width={layoutSizes.siderWidth}
+          collapsedWidth={layoutSizes.siderCollapsedWidth}
+          breakpoint="lg"
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+          trigger={null}
+          className="app-sider"
+        >
+          {sidebarContent}
+        </Layout.Sider>
+      )}
       <Layout>
-        <Layout.Header className={styles.header}>
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed((value) => !value)}
-            aria-label={collapsed ? "Expand menu" : "Collapse menu"}
-          />
+        <Layout.Header className="app-header">
+          <div className="app-header__start">
+            {isMobile ? (
+              <>
+                <Button
+                  type="text"
+                  icon={<MenuOutlined />}
+                  onClick={() => setMenuOpenOn(pathname)}
+                  aria-label="Open menu"
+                />
+                <img src={logoMark} alt={BRAND_NAME} className="app-brand__mark" />
+              </>
+            ) : (
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed((value) => !value)}
+                aria-label={collapsed ? "Expand menu" : "Collapse menu"}
+              />
+            )}
+          </div>
           <Dropdown menu={accountMenu} trigger={["click"]} placement="bottomRight">
-            <Button type="text" className={styles.userButton} aria-label="Account menu">
-              <Flex align="center" gap="small">
-                <Avatar size="small" icon={<UserOutlined />} />
-                <Flex vertical className={styles.userText}>
-                  <Typography.Text strong>{profile?.name ?? "Admin"}</Typography.Text>
-                  {profile?.admin_role?.name && (
-                    <Typography.Text type="secondary" className={styles.userRole}>
-                      {profile.admin_role.name}
-                    </Typography.Text>
-                  )}
-                </Flex>
-              </Flex>
+            {/* Named by its text (name and role), which stays readable to screen readers on phones. */}
+            <Button type="text" className="app-account">
+              <Avatar className="app-account__avatar" aria-hidden>
+                {getInitials(profile?.name)}
+              </Avatar>
+              <span className="app-account__text">
+                <Typography.Text strong>{profile?.name ?? "Account"}</Typography.Text>
+                {profile?.admin_role?.name && (
+                  <span className="app-account__role">{formatLabel(profile.admin_role.name)}</span>
+                )}
+              </span>
+              <DownOutlined className="app-account__caret" />
             </Button>
           </Dropdown>
         </Layout.Header>
-        <Layout.Content className={styles.content}>
+        <Layout.Content className="app-content">
           <Spin spinning={navigation.state === "loading"} delay={200}>
             <Outlet />
           </Spin>

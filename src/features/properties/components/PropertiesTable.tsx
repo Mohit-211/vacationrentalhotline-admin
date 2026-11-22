@@ -1,6 +1,7 @@
 import { EyeOutlined } from "@ant-design/icons";
 import { Button, Table, Tooltip, type TableProps } from "antd";
 import { useNavigate } from "react-router";
+import { TruncatedText } from "@/components/TruncatedText";
 import { paths } from "@/routes/paths";
 import { displayValue, formatDate } from "@/utils/format";
 import type { Property } from "../types";
@@ -21,21 +22,37 @@ export function PropertiesTable({ properties, loading }: PropertiesTableProps) {
       render: displayValue,
       sorter: (a, b) => (a.property_owner_name ?? "").localeCompare(b.property_owner_name ?? ""),
     },
-    { title: "Address", dataIndex: "full_address", ellipsis: true, render: displayValue },
+    {
+      title: "Address",
+      dataIndex: "full_address",
+      responsive: ["md"],
+      render: (address?: string | null) => <TruncatedText text={address} />,
+    },
     {
       title: "Subscription",
       dataIndex: "subscription_status",
       render: (status?: string | null) => <SubscriptionTag status={status} />,
     },
-    { title: "Starts", dataIndex: "subscription_start_date", render: formatDate },
-    { title: "Ends", dataIndex: "subscription_end_date", render: formatDate },
+    {
+      title: "Starts",
+      dataIndex: "subscription_start_date",
+      responsive: ["lg"],
+      render: formatDate,
+    },
+    {
+      title: "Ends",
+      dataIndex: "subscription_end_date",
+      responsive: ["sm"],
+      render: formatDate,
+    },
     {
       title: "Actions",
       key: "actions",
-      width: 80,
+      width: 72,
       render: (_, property) => (
         <Tooltip title="View details">
           <Button
+            type="text"
             icon={<EyeOutlined />}
             aria-label={`View property of ${property.property_owner_name ?? "unknown owner"}`}
             onClick={() => navigate(paths.property(property.id))}

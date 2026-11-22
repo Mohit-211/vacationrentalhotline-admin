@@ -51,8 +51,9 @@ Without an override, local development talks to the **production** API. See `.en
 src/
   api/          HTTP client (adds the admin token, ends expired sessions), query client, shared API types
   assets/       Images bundled with the app
-  components/   Shared UI: app layout, page header, form actions, delete button, error and loading states
-  config/       Environment variables and the Ant Design theme
+  components/   Shared UI: app layout, page header, form actions, delete button, truncated table text,
+                error and loading states
+  config/       Environment variables
   features/     One folder per business area:
     <feature>/
       api.ts        The feature's endpoints and TanStack Query keys
@@ -60,7 +61,7 @@ src/
       components/   Components used only by this feature
       pages/        Route components, one per URL
   routes/       Router, URL paths, sign-in guard, redirects from old URLs, 404 and error pages
-  styles/       Global CSS
+  styles/       The design: theme.ts (colours, sizes, Ant Design theme) and global.css (the only stylesheet)
   utils/        Formatting, CSV export, search and error helpers
 ```
 
@@ -73,7 +74,12 @@ Features: `admins` (Access Management), `auth` (sign-in, profile, password), `co
 - **Imports:** use the `@/` alias for anything outside the current feature.
 - **Data:** components call the feature's `api.ts` functions through `useQuery` / `useMutation` with that feature's query keys; never call axios from a component.
 - **API contract:** endpoint paths, field names, and multipart vs JSON bodies match the existing API. Change them only together with the backend.
-- **UI:** Ant Design components only. Show toasts with `App.useApp().message`.
+- **UI:** Ant Design components only. Show toasts with `App.useApp().message`. Every page starts with `PageHeader`, whose title is the page's `<h1>`.
+- **Styling:** the whole design lives in `src/styles`.
+  - `theme.ts` holds every colour and size. The logo's blue and green are darkened just enough to meet WCAG AA contrast (4.5:1) and feed the Ant Design theme.
+  - `global.css` is the only stylesheet. It reads those values through Ant Design's `--ant-*` CSS variables.
+  - Components use its classes and never style themselves. ESLint rejects inline `style` props, hard-coded colours outside `theme.ts`, and any other stylesheet import.
+- **Small screens:** below 768px the menu moves into a drawer opened from the header. Tables drop secondary columns on narrow screens (the column `responsive` option).
 
 ## Authentication
 

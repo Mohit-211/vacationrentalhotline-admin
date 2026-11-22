@@ -21,6 +21,7 @@ export function DeleteButton({
 }: DeleteButtonProps) {
   const button = (
     <Button
+      type="text"
       danger
       icon={<DeleteOutlined />}
       aria-label={`Delete ${itemName}`}

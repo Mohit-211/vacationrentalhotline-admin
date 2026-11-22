@@ -43,9 +43,11 @@ export function AdminEditPage() {
         onBack={goToList}
       />
       {adminQuery.error ? (
-        <QueryErrorResult error={adminQuery.error} onRetry={() => adminQuery.refetch()} />
+        <Card>
+          <QueryErrorResult error={adminQuery.error} onRetry={() => adminQuery.refetch()} />
+        </Card>
       ) : (
-        <Card loading={adminQuery.isPending}>
+        <Card className="form-card" loading={adminQuery.isPending}>
           {adminQuery.data && (
             <AdminForm
               initialValues={toFormValues(adminQuery.data)}

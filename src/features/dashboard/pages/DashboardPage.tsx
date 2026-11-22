@@ -1,10 +1,11 @@
 import { ContactsOutlined, DollarOutlined, HomeOutlined, TeamOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Col, Row } from "antd";
+import { Card, Col, Row } from "antd";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
 import { useProfile } from "@/features/auth/useProfile";
 import { paths } from "@/routes/paths";
+import { layoutSizes } from "@/styles/theme";
 import { isForbiddenError } from "@/utils/errors";
 import { formatCurrency } from "@/utils/format";
 import {
@@ -48,18 +49,29 @@ export function DashboardPage() {
     queryFn: fetchPropertyCountsByCountry,
   });
 
+  const header = (
+    <PageHeader
+      title={profile?.name ? `Welcome back, ${profile.name}` : "Welcome back"}
+      subtitle="A snapshot of the platform"
+    />
+  );
+
   // Employees (sub-admins) are refused the owner statistics; show "no access" for the page.
   if (isForbiddenError(topOwners.error)) {
-    return <QueryErrorResult error={topOwners.error} />;
+    return (
+      <>
+        {header}
+        <Card>
+          <QueryErrorResult error={topOwners.error} />
+        </Card>
+      </>
+    );
   }
 
   return (
     <>
-      <PageHeader
-        title={profile?.name ? `Welcome back, ${profile.name}` : "Welcome back"}
-        subtitle="A snapshot of the platform"
-      />
-      <Row gutter={[16, 16]}>
+      {header}
+      <Row gutter={[layoutSizes.gridGutter, layoutSizes.gridGutter]}>
         <Col xs={24} sm={12} xl={6}>
           <StatCard
             title="Registered users"
@@ -84,6 +96,7 @@ export function DashboardPage() {
           <StatCard
             title="Properties"
             icon={<HomeOutlined />}
+            tone="success"
             value={propertyCount.data}
             loading={propertyCount.isPending}
             error={propertyCount.error}
@@ -94,6 +107,7 @@ export function DashboardPage() {
           <StatCard
             title="Total revenue"
             icon={<DollarOutlined />}
+            tone="success"
             value={totalRevenue.data}
             loading={totalRevenue.isPending}
             error={totalRevenue.error}

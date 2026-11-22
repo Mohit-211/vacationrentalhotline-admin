@@ -14,11 +14,12 @@ interface PeriodCountCardProps {
 export function PeriodCountCard({ title, queryKey, fetchCount }: PeriodCountCardProps) {
   const [period, setPeriod] = useState<RegistrationPeriod>("week");
   const countQuery = useQuery({ queryKey: queryKey(period), queryFn: () => fetchCount(period) });
+  const periodLabel = REGISTRATION_PERIODS.find((option) => option.value === period)?.label ?? "";
 
   return (
     <Card
       title={title}
-      style={{ height: "100%" }}
+      className="card-fill"
       extra={
         <Segmented<RegistrationPeriod>
           size="small"
@@ -29,6 +30,7 @@ export function PeriodCountCard({ title, queryKey, fetchCount }: PeriodCountCard
       }
     >
       <Statistic
+        title={`Registered ${periodLabel.toLowerCase()}`}
         loading={countQuery.isPending}
         value={countQuery.error ? EMPTY_VALUE : formatNumber(countQuery.data)}
       />

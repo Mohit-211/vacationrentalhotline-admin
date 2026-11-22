@@ -23,7 +23,6 @@ export function AdminForm({
       requiredMark={false}
       initialValues={initialValues}
       onFinish={onSubmit}
-      style={{ maxWidth: 560 }}
     >
       <Form.Item
         label="Name"

@@ -1,5 +1,385 @@
+/*
+ * The panel's only stylesheet.
+ *
+ * Colours, fonts, radii and spacing come from the Ant Design theme in src/styles/theme.ts,
+ * read here through the --ant-* CSS variables Ant Design generates from it. Components must not
+ * use inline styles or their own stylesheets (ESLint enforces this): reuse a class below or add
+ * one, and never hard-code a colour.
+ *
+ * Rules that adjust an Ant Design part (.ant-*) repeat one of its classes so they outrank
+ * Ant Design's own styles, which load after this file.
+ */
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hidden on screen but still read by screen readers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- App shell: sidebar, header, content ---------- */
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-sider {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  border-inline-end: 1px solid var(--ant-color-border-secondary);
+}
+
+/* Same height as the header so the sidebar and header borders line up. */
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-sm);
+  height: 64px;
+  padding-inline: var(--ant-padding-lg);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+  overflow: hidden;
+}
+
+.app-brand--collapsed {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.app-brand__mark {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+/* Wraps onto two lines rather than being cut off. */
+.app-brand__name {
+  color: var(--ant-color-text);
+  font-size: var(--ant-font-size-lg);
+  font-weight: var(--ant-font-weight-strong);
+  line-height: 1.25;
+}
+
+.app-menu.ant-menu {
+  padding-block: var(--ant-padding-xs);
+  border-inline-end: 0;
+}
+
+/* The menu drawer on phones: the sidebar's content, edge to edge. */
+.ant-drawer .ant-drawer-body.app-drawer__body {
+  padding: 0;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ant-margin);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.app-header__start {
+  display: flex;
+  align-items: center;
+  gap: var(--ant-margin-xs);
+}
+
+.app-account.ant-btn {
+  height: auto;
+  padding: var(--ant-padding-xxs) var(--ant-padding-xs);
+  gap: var(--ant-margin-xs);
+}
+
+.app-account__avatar.ant-avatar {
+  background: var(--ant-color-primary);
+  font-weight: var(--ant-font-weight-strong);
+}
+
+.app-account__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.3;
+}
+
+.app-account__role {
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+}
+
+.app-account__caret {
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+}
+
+.app-content {
+  padding: var(--ant-padding-lg);
+}
+
+/* ---------- Page building blocks ---------- */
+
+.page-header {
+  margin-bottom: var(--ant-margin-lg);
+}
+
+/* The page's <h1>, at the size of a level-3 heading. */
+.page-header__title.ant-typography {
+  margin: 0;
+  font-size: var(--ant-font-size-heading-3);
+  line-height: var(--ant-line-height-heading-3);
+}
+
+.page-header__subtitle {
+  display: block;
+  margin-top: var(--ant-margin-xxs);
+}
+
+.page-loader {
+  min-height: 240px;
+}
+
+/* Search fields and selects in page and card headers. */
+.toolbar-search {
+  width: 280px;
+}
+
+.toolbar-select {
+  width: 160px;
+}
+
+/* Cards holding a form are sized to the form, which reads best at a comfortable line length. */
+.form-card {
+  max-width: 640px;
+}
+
+.form-actions.ant-form-item {
+  margin-top: var(--ant-margin-xs);
+  margin-bottom: 0;
+}
+
+/* Multi-line text from users, such as contact-form messages. */
+.text-prewrap.ant-typography {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Long text in a table cell: one line, cut off with "…" (TruncatedText shows the rest on hover). */
+.cell-truncate {
+  display: block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Label and value pairs, labels in the secondary text colour. */
+.detail-list {
+  display: grid;
+  grid-template-columns: max-content auto;
+  gap: var(--ant-margin-xxs) var(--ant-margin-sm);
+  margin: 0;
+}
+
+.detail-list dt {
+  color: var(--ant-color-text-secondary);
+}
+
+.detail-list dd {
+  margin: 0;
+}
+
+/* Notes and similar short entries, one per row. */
+.note-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.note-list > li {
+  padding-block: var(--ant-padding-sm);
+  border-bottom: 1px solid var(--ant-color-split);
+  white-space: pre-wrap;
+}
+
+.note-list > li:first-child {
+  padding-top: 0;
+}
+
+.note-list > li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+/* Cards that sit side by side in a grid row stretch to the same height. */
+.card-fill {
+  height: 100%;
+}
+
+/* A Result title that is also the page's <h1> keeps the Result title look. */
+.result-title.ant-typography {
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* Result illustrations ("No access", "Page not found") shrink to fit narrow screens. */
+.ant-result .ant-result-icon.ant-result-image {
+  max-width: 100%;
+  height: auto;
+}
+
+.ant-result .ant-result-icon.ant-result-image svg {
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Sign-in page ---------- */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ant-padding-lg);
+  background: var(--ant-color-bg-layout);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-logo {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  margin: var(--ant-margin-xs) auto var(--ant-margin-lg);
+}
+
+.auth-heading {
+  margin-bottom: var(--ant-margin-lg);
+  text-align: center;
+}
+
+/* The page's <h1>, at the size of a level-3 heading. */
+.auth-heading__title.ant-typography {
+  margin-bottom: var(--ant-margin-xxs);
+  font-size: var(--ant-font-size-heading-3);
+  line-height: var(--ant-line-height-heading-3);
+}
+
+.auth-alert {
+  margin-bottom: var(--ant-margin-lg);
+}
+
+/* ---------- Dashboard ---------- */
+
+.stat-card__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ant-border-radius-lg);
+  background: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary);
+  font-size: var(--ant-font-size-xl);
+}
+
+.stat-card__icon--success {
+  background: var(--ant-color-success-bg);
+  color: var(--ant-color-success);
+}
+
+.stat-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ant-margin-xxs);
+  margin-top: var(--ant-margin-sm);
+}
+
+/* The revenue chart and its loading placeholder share this height, so nothing jumps on load. */
+.chart-area {
+  height: 320px;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 575px) {
+  .app-header.ant-layout-header {
+    padding-inline: var(--ant-padding);
+  }
+
+  .app-content {
+    padding: var(--ant-padding);
+  }
+
+  .app-content .ant-card .ant-card-head,
+  .app-content .ant-card .ant-card-body {
+    padding-inline: var(--ant-padding);
+  }
+
+  /* A card's title and its controls stack rather than the title being cut off. */
+  .app-content .ant-card .ant-card-head-wrapper {
+    flex-wrap: wrap;
+    gap: var(--ant-margin-xs);
+    padding-block: var(--ant-padding-xs);
+  }
+
+  .app-content .ant-card .ant-card-head-title {
+    flex: 1 0 auto;
+  }
+
+  .app-content .ant-card .ant-card-extra {
+    margin-inline-start: 0;
+  }
+
+  /* Only the avatar shows; the name and role stay available to screen readers. */
+  .app-account__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .app-account__caret {
+    display: none;
+  }
+
+  /* Page actions take their own full-width row; the search field spans it. */
+  .page-header__extra {
+    width: 100%;
+  }
+
+  .toolbar-search {
+    width: 100%;
+  }
+
+  /* Tighter table cells (as in Ant Design's small tables) so key columns fit on a phone. */
+  .app-content .ant-table-wrapper .ant-table-cell {
+    padding-inline: var(--ant-padding-xs);
+  }
+
+  .app-content .ant-result {
+    padding-inline: 0;
+  }
 }

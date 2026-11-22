@@ -6,7 +6,6 @@ import { paths } from "@/routes/paths";
 import { getErrorMessage, getErrorStatus } from "@/utils/errors";
 import { login, type LoginCredentials } from "../api";
 import { useAuth } from "../AuthContext";
-import styles from "./LoginPage.module.css";
 
 interface LoginLocationState {
   from?: Location;
@@ -24,17 +23,17 @@ export function LoginPage() {
   }
 
   return (
-    <main className={styles.page}>
-      <Card className={styles.card}>
+    <main className="auth-page">
+      <Card className="auth-card">
         <img
           src={logo}
           alt="Vacation Rental Hotline"
           width={240}
           height={90}
-          className={styles.logo}
+          className="auth-logo"
         />
-        <div className={styles.heading}>
-          <Typography.Title level={3} style={{ marginBottom: 4 }}>
+        <div className="auth-heading">
+          <Typography.Title level={1} className="auth-heading__title">
             Welcome back
           </Typography.Title>
           <Typography.Text type="secondary">Sign in to the admin panel</Typography.Text>
@@ -66,7 +65,7 @@ export function LoginPage() {
               type="error"
               showIcon
               title={getLoginErrorMessage(loginMutation.error)}
-              style={{ marginBottom: 24 }}
+              className="auth-alert"
             />
           )}
           <Button

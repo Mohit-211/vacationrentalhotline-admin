@@ -23,7 +23,45 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/consistent-type-imports": "error",
       "no-console": ["warn", { allow: ["warn", "error"] }],
+      // The design lives in src/styles: colours and sizes in theme.ts, classes in global.css.
+      // Components use those and never style themselves.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXAttribute[name.name=/^(style|styles|bodyStyle|headStyle)$/]",
+          message:
+            "No inline styles: use a class from src/styles/global.css (add one there if needed).",
+        },
+        {
+          selector: "Literal[value=/^#[0-9a-fA-F]{3,8}$/], Literal[value=/^(rgb|hsl)a?\\(/]",
+          message:
+            "No hard-coded colours: use a token from src/styles/theme.ts or a global.css class.",
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "*.css",
+                "*.scss",
+                "*.sass",
+                "*.less",
+                "!@/styles/global.css",
+                "!antd/dist/reset.css",
+              ],
+              message: "All styles live in src/styles/global.css; do not add other stylesheets.",
+            },
+          ],
+        },
+      ],
     },
+  },
+  // The one place colours are defined.
+  {
+    files: ["src/styles/theme.ts"],
+    rules: { "no-restricted-syntax": "off" },
   },
   // Turns off stylistic rules that would fight Prettier; keep it last.
   prettier,

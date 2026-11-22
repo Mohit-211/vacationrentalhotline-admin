@@ -1,17 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, Descriptions, Empty, Flex, List } from "antd";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { Card, Descriptions, Empty, Flex } from "antd";
+import { useParams } from "react-router";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
 import { paths } from "@/routes/paths";
+import { useGoBack } from "@/routes/useGoBack";
 import { displayValue, formatDateTime } from "@/utils/format";
 import { fetchProperty, propertyKeys } from "../api";
 import { SubscriptionTag } from "../components/SubscriptionTag";
 
 export function PropertyDetailsPage() {
   const { propertyId = "" } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
   const propertyQuery = useQuery({
     queryKey: propertyKeys.detail(propertyId),
     queryFn: () => fetchProperty(propertyId),
@@ -19,8 +18,8 @@ export function PropertyDetailsPage() {
   const property = propertyQuery.data;
   const notes = property?.property_notes ?? [];
 
-  // Opened from a user's page or the property list: go back there; opened directly: go to the list.
-  const goBack = () => (location.key === "default" ? navigate(paths.properties) : navigate(-1));
+  // Back to the user's page or the property list it was opened from; else to the property list.
+  const goBack = useGoBack(paths.properties);
 
   return (
     <>
@@ -30,7 +29,9 @@ export function PropertyDetailsPage() {
         onBack={goBack}
       />
       {propertyQuery.error ? (
-        <QueryErrorResult error={propertyQuery.error} onRetry={() => propertyQuery.refetch()} />
+        <Card>
+          <QueryErrorResult error={propertyQuery.error} onRetry={() => propertyQuery.refetch()} />
+        </Card>
       ) : (
         <Flex vertical gap="large">
           <Card title="Address" loading={propertyQuery.isPending}>
@@ -111,12 +112,11 @@ export function PropertyDetailsPage() {
           </Card>
           <Card title="Notes" loading={propertyQuery.isPending}>
             {notes.length ? (
-              <List
-                dataSource={notes}
-                renderItem={(note, index) => (
-                  <List.Item key={note.id ?? index}>{note.notes}</List.Item>
-                )}
-              />
+              <ul className="note-list">
+                {notes.map((note, index) => (
+                  <li key={note.id ?? index}>{note.notes}</li>
+                ))}
+              </ul>
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}

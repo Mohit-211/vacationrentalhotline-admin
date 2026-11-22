@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
 import { paths } from "@/routes/paths";
-import { displayValue } from "@/utils/format";
+import { displayValue, formatLabel } from "@/utils/format";
 import { useProfile } from "../useProfile";
 
 export function ProfilePage() {
@@ -24,7 +24,9 @@ export function ProfilePage() {
         }
       />
       {profileQuery.error ? (
-        <QueryErrorResult error={profileQuery.error} onRetry={() => profileQuery.refetch()} />
+        <Card>
+          <QueryErrorResult error={profileQuery.error} onRetry={() => profileQuery.refetch()} />
+        </Card>
       ) : (
         <Card loading={profileQuery.isPending}>
           <Descriptions
@@ -32,7 +34,7 @@ export function ProfilePage() {
             items={[
               { key: "name", label: "Name", children: displayValue(profile?.name) },
               { key: "email", label: "Email", children: displayValue(profile?.email) },
-              { key: "role", label: "Role", children: displayValue(profile?.admin_role?.name) },
+              { key: "role", label: "Role", children: formatLabel(profile?.admin_role?.name) },
             ]}
           />
         </Card>

@@ -38,7 +38,7 @@ export function AdminCreatePage() {
         subtitle="Give someone access to this panel"
         onBack={goToList}
       />
-      <Card>
+      <Card className="form-card">
         <AdminForm
           submitLabel="Add admin"
           submitting={createMutation.isPending}

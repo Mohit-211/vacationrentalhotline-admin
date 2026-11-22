@@ -1,4 +1,4 @@
-import { Button, Result } from "antd";
+import { Button, Result, Typography } from "antd";
 import { useNavigate } from "react-router";
 import { paths } from "./paths";
 
@@ -7,7 +7,11 @@ export function NotFoundPage() {
   return (
     <Result
       status="404"
-      title="Page not found"
+      title={
+        <Typography.Title level={1} className="result-title">
+          Page not found
+        </Typography.Title>
+      }
       subTitle="This page does not exist or has moved."
       extra={
         <Button type="primary" onClick={() => navigate(paths.dashboard)}>

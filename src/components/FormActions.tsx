@@ -16,7 +16,7 @@ export function FormActions({
   submitDisabled = false,
 }: FormActionsProps) {
   return (
-    <Form.Item style={{ marginBottom: 0, marginTop: 8 }}>
+    <Form.Item className="form-actions">
       <Space>
         <Button type="primary" htmlType="submit" loading={submitting} disabled={submitDisabled}>
           {submitLabel}

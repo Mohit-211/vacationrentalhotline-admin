@@ -1,4 +1,4 @@
-import { Card, Empty, Flex, List, Typography } from "antd";
+import { Card, Flex, Table, Typography, type TableProps } from "antd";
 import { CountryFlag } from "@/components/CountryFlag";
 import { formatNumber } from "@/utils/format";
 import type { CountryPropertyCount } from "../types";
@@ -9,26 +9,40 @@ interface CountriesCardProps {
   error: unknown;
 }
 
+const columns: TableProps<CountryPropertyCount>["columns"] = [
+  {
+    title: "Country",
+    dataIndex: "country",
+    render: (country: string) => (
+      <Flex align="center" gap="small">
+        <CountryFlag country={country} />
+        {country}
+      </Flex>
+    ),
+  },
+  {
+    title: "Properties",
+    dataIndex: "property_count",
+    align: "right",
+    render: (count: number) => formatNumber(count),
+  },
+];
+
 export function CountriesCard({ countries, loading, error }: CountriesCardProps) {
   return (
-    <Card title="Properties by country" style={{ height: "100%" }} loading={loading}>
+    <Card title="Properties by country" className="card-fill">
       {error ? (
         <Typography.Text type="danger">Could not load countries</Typography.Text>
-      ) : countries?.length ? (
-        <List
-          dataSource={countries}
-          renderItem={(item) => (
-            <List.Item key={item.country}>
-              <Flex align="center" gap="small">
-                <CountryFlag country={item.country} />
-                <Typography.Text>{item.country}</Typography.Text>
-              </Flex>
-              <Typography.Text strong>{formatNumber(item.property_count)}</Typography.Text>
-            </List.Item>
-          )}
-        />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No properties yet" />
+        <Table
+          size="small"
+          rowKey="country"
+          columns={columns}
+          dataSource={countries}
+          loading={loading}
+          locale={{ emptyText: "No properties yet" }}
+          pagination={{ pageSize: 5, size: "small", hideOnSinglePage: true }}
+        />
       )}
     </Card>
   );
