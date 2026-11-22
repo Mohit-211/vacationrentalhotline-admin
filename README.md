@@ -1,70 +1,94 @@
-# Getting Started with Create React App
+# Vacation Rental Hotline — Admin Panel
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Web admin panel for Vacation Rental Hotline: app users and their properties, payments, contact-form messages, admin access, and the app's content pages.
 
-## Available Scripts
+## Tech stack
 
-In the project directory, you can run:
+- React 19 and TypeScript (strict), built with Vite 8
+- Ant Design 6 for all UI, with `@ant-design/icons` and `@ant-design/plots` for charts
+- React Router 8 (data router; every page is lazy-loaded)
+- TanStack Query 5 for server data, axios for HTTP
+- Tiptap 3 for rich-text editing, DOMPurify to sanitise HTML, dayjs for dates
+- ESLint 10 with typescript-eslint, and Prettier
 
-### `npm start`
+## Requirements
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Node.js 22.22 or later (required by React Router 8)
+- npm 10 or later
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting started
 
-### `npm test`
+```bash
+npm ci
+npm run dev
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The dev server runs on http://localhost:3000.
 
-### `npm run build`
+### Environment variables
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The API addresses are read from `.env`, which is committed with the production values. To use a different API, create `.env.local` (it is git-ignored) with the same variables:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+VITE_API_BASE_URL=https://staging.example.com/api/v1/
+VITE_ASSETS_BASE_URL=https://staging.example.com/images/
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Without an override, local development talks to the **production** API. See `.env.example` for what each variable means.
 
-### `npm run eject`
+## Scripts
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+| Script                                    | What it does                                           |
+| ----------------------------------------- | ------------------------------------------------------ |
+| `npm run dev`                             | Start the dev server with hot reload (port 3000)       |
+| `npm run build`                           | Type-check, then build the production site to `build/` |
+| `npm run preview`                         | Serve the production build locally                     |
+| `npm run typecheck`                       | Type-check only                                        |
+| `npm run lint` / `npm run lint:fix`       | Run ESLint / fix what it can                           |
+| `npm run format` / `npm run format:check` | Format with Prettier / check formatting                |
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Project structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+src/
+  api/          HTTP client (adds the admin token, ends expired sessions), query client, shared API types
+  assets/       Images bundled with the app
+  components/   Shared UI: app layout, page header, form actions, delete button, rich-text editor, image upload
+  config/       Environment variables and the Ant Design theme
+  features/     One folder per business area:
+    <feature>/
+      api.ts        The feature's endpoints and TanStack Query keys
+      types.ts      Data shapes returned by the API
+      components/   Components used only by this feature
+      pages/        Route components, one per URL
+  routes/       Router, URL paths, sign-in guard, redirects from old URLs, 404 and error pages
+  styles/       Global CSS (typography for rich-text content)
+  utils/        Formatting, CSV export, search, image and error helpers
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Features: `admins` (Access Management), `auth` (sign-in, profile, password), `banners`, `contact`, `content` (Terms & Conditions, About Us), `dashboard`, `login-activity`, `payments`, `properties`, `roles`, `services`, `users`.
 
-## Learn More
+## Conventions
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **File names:** components and pages are PascalCase (`UsersPage.tsx`) and route components end in `Page`. Other modules are camelCase (`api.ts`, `format.ts`). Feature folders are kebab-case (`login-activity`).
+- **URLs:** kebab-case and resource-based (`/users/:userId/edit`). Build them with `paths` from `src/routes/paths.ts` instead of string literals. URLs from the previous version of the app redirect to their new paths (`LEGACY_REDIRECTS` in `src/routes/router.tsx`).
+- **Imports:** use the `@/` alias for anything outside the current feature.
+- **Data:** components call the feature's `api.ts` functions through `useQuery` / `useMutation` with that feature's query keys; never call axios from a component.
+- **API contract:** endpoint paths, field names, and multipart vs JSON bodies match the existing API, including its spellings (for example `getAllBannerImgaeByAdmin`). Change them only together with the backend.
+- **UI:** Ant Design components only. Show toasts with `App.useApp().message`.
+- **HTML from the API:** render it with `<SafeHtml>`, never with `dangerouslySetInnerHTML` directly.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Authentication
 
-### Code Splitting
+The admin token is kept in `localStorage` under `adminToken` and sent as the `x-access-token` header on every request (`src/api/client.ts`). The API reports an expired token as HTTP 500 "jwt expired" and a deleted admin as HTTP 403 "Admin not found."; both sign the admin out with a message. HTTP 401 means the admin's role cannot see that data, and the page shows "No access".
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Pages not in the menu
 
-### Analyzing the Bundle Size
+Banners, Services, Terms & Conditions, About Us, Roles, Login Activity and Edit User work but are deliberately not linked from the menu yet. Open them by URL: `/banners`, `/services`, `/content/terms`, `/content/about`, `/roles`, `/login-activity`, `/users/:userId/edit`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Deployment
 
-### Making a Progressive Web App
+`npm run build` writes a static site to `build/`. The server must answer every path that is not a file with `index.html` (single-page-app fallback), for example:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Apache: `FallbackResource /index.html`
+- nginx: `try_files $uri /index.html;`
