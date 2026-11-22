@@ -11,12 +11,13 @@ export interface TrendPoint {
 
 /**
  * Daily figures grouped so the chart stays readable: by day up to a month, by week up to
- * a quarter, by month beyond. The API counts days in UTC.
+ * a quarter, by month beyond. The API counts US Eastern days.
  */
 export function toTrend(daily: DailyStats[], days: number, metric: TrendMetric): TrendPoint[] {
   const unit = days <= 31 ? "day" : days <= 120 ? "week" : "month";
   const buckets = new Map<string, TrendPoint>();
   for (const entry of daily) {
+    // A calendar date with no time: read and shown as it is, whatever the viewer's time zone.
     const date = dayjs(entry.date);
     const start = unit === "day" ? date : date.startOf(unit);
     const key = start.format("YYYY-MM-DD");

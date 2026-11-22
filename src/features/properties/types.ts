@@ -25,6 +25,8 @@ export interface Property {
   autoRenews: boolean;
   /** True while the customer's free cover covers it. */
   complimentary: boolean;
+  /** False exactly while paid cover runs, which stops a delete. Free cover doesn't. */
+  canDelete: boolean;
   createdAt: string;
   updatedAt: string;
 }

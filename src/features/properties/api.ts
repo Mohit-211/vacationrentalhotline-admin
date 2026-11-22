@@ -24,7 +24,7 @@ export async function updateProperty(propertyId: Id, values: PropertyValues): Pr
   await apiClient.patch(`/admin/properties/${propertyId}`, values);
 }
 
-/** Refused (409 PROPERTY_COVERED) while the property is covered. */
+/** Refused (409 PROPERTY_COVERED) while paid cover runs, when `canDelete` is false. */
 export async function deleteProperty(propertyId: Id): Promise<void> {
   await apiClient.delete(`/admin/properties/${propertyId}`);
 }
@@ -37,6 +37,19 @@ export async function cancelRenewal(propertyId: Id): Promise<void> {
 /** Ends cover now and stops renewal; nothing is refunded. */
 export async function endCover(propertyId: Id): Promise<void> {
   await apiClient.post(`/admin/properties/${propertyId}/end-cover`);
+}
+
+/**
+ * Moves the property's paid cover, with its paid-through date and renewal, to another of the
+ * customer's properties that isn't covered. Nothing is charged or refunded. The API then deletes
+ * this property and its notes, and answers with the newly covered property.
+ */
+export async function moveCover(propertyId: Id, toPropertyId: Id): Promise<PropertyDetails> {
+  const { data } = await apiClient.post<ApiData<PropertyDetails>>(
+    `/admin/properties/${propertyId}/move-cover`,
+    { toPropertyId },
+  );
+  return data.data;
 }
 
 export async function addNote(propertyId: Id, body: string): Promise<PropertyNote> {

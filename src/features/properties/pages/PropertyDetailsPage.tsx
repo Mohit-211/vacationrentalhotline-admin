@@ -1,4 +1,4 @@
-import { EditOutlined, ExportOutlined, StopOutlined } from "@ant-design/icons";
+import { EditOutlined, ExportOutlined, StopOutlined, SwapOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   App,
@@ -13,6 +13,7 @@ import {
   Typography,
   type TableProps,
 } from "antd";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { DeleteButton } from "@/components/DeleteButton";
 import { PageHeader } from "@/components/PageHeader";
@@ -37,6 +38,7 @@ import {
 import { cancelRenewal, deleteProperty, endCover, fetchProperty, propertyKeys } from "../api";
 import { CoverTag } from "../components/CoverStatus";
 import { coverSummary } from "../cover";
+import { MoveCoverModal } from "../components/MoveCoverModal";
 import { NotesCard } from "../components/NotesCard";
 import type { PropertyDetails, PropertyPayment } from "../types";
 
@@ -49,6 +51,7 @@ export function PropertyDetailsPage() {
   const { message, modal } = App.useApp();
   const { can } = useAuth();
   const { data: countries } = useCountries();
+  const [moveCoverOpen, setMoveCoverOpen] = useState(false);
   const propertyQuery = useQuery({
     queryKey: propertyKeys.detail(propertyId),
     queryFn: () => fetchProperty(propertyId),
@@ -118,6 +121,8 @@ export function PropertyDetailsPage() {
   }
 
   const covered = property?.status === "active";
+  // The API allows no delete exactly while paid cover runs; free cover doesn't count.
+  const paidCover = property ? !property.canDelete : false;
   const title = property
     ? [property.addressLine1, property.addressLine2].filter(Boolean).join(", ")
     : "Property";
@@ -150,6 +155,11 @@ export function PropertyDetailsPage() {
                   </Button>
                 </Popconfirm>
               )}
+              {can("billing.manage") && paidCover && (
+                <Button icon={<SwapOutlined />} onClick={() => setMoveCoverOpen(true)}>
+                  Move cover
+                </Button>
+              )}
               {can("billing.manage") && covered && !property.complimentary && (
                 <Button danger loading={endCoverMutation.isPending} onClick={confirmEndCover}>
                   End cover now
@@ -168,12 +178,8 @@ export function PropertyDetailsPage() {
                     itemName="this property"
                     description="Its notes are deleted too. Payments stay on record."
                     loading={deleteMutation.isPending}
-                    disabled={covered}
-                    disabledReason={
-                      property.complimentary
-                        ? "It is covered by the customer's free cover. Turn that off before deleting it."
-                        : "Covered properties can't be deleted. Cancel its renewal or end its cover first."
-                    }
+                    disabled={!property.canDelete}
+                    disabledReason="A property with paid cover can't be deleted. End or move its cover first, or cancel its renewal and delete it once the cover ends."
                     onConfirm={() => deleteMutation.mutate()}
                   />
                 </>
@@ -182,6 +188,14 @@ export function PropertyDetailsPage() {
           )
         }
       />
+      {property && can("billing.manage") && (
+        <MoveCoverModal
+          key={property.id}
+          property={property}
+          open={moveCoverOpen}
+          onClose={() => setMoveCoverOpen(false)}
+        />
+      )}
       <Flex vertical gap="large">
         <Row gutter={[layoutSizes.gridGutter, layoutSizes.gridGutter]}>
           <Col xs={24} xl={12}>

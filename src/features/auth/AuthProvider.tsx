@@ -22,7 +22,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     queryKey: meQueryKey,
     queryFn: fetchMeOrNull,
     staleTime: Infinity,
-    // Signed out and customer accounts come back as null; only network and server errors throw.
+    // Signed out comes back as null; only network and server errors throw.
     retry: 2,
   });
 

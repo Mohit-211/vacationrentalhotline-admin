@@ -17,7 +17,7 @@ apiClient.interceptors.response.use(undefined, (error: unknown) => {
   if (
     axios.isAxiosError(error) &&
     error.response?.status === 401 &&
-    !error.config?.url?.startsWith("/auth/sign-in")
+    !error.config?.url?.startsWith("/admin/auth/sign-in")
   ) {
     reportSessionEnded();
   }

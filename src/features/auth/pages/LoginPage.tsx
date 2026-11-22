@@ -4,7 +4,6 @@ import { Link, Navigate, useLocation, type Location } from "react-router";
 import logo from "@/assets/logo-480.png";
 import { paths } from "@/routes/paths";
 import { getErrorCode, getErrorMessage, getErrorStatus } from "@/utils/errors";
-import { NotStaffError } from "../api";
 import { useAuth } from "../AuthContext";
 import { useLandingPath } from "../useLandingPath";
 import type { SignInValues } from "../types";
@@ -90,9 +89,12 @@ export function LoginPage() {
 }
 
 function getSignInErrorMessage(error: unknown): string {
-  if (error instanceof NotStaffError) return error.message;
   // One message for unknown emails and wrong passwords, so the form does not reveal which exist.
   if (getErrorCode(error) === "INVALID_EMAIL_OR_PASSWORD") return "Incorrect email or password.";
+  // Only said once the password is right. Customers have their own sign-in, on the website.
+  if (getErrorCode(error) === "CUSTOMER_ACCOUNT") {
+    return "This is a customer account. Customers sign in on the website, not here.";
+  }
   if (getErrorStatus(error) === 429) {
     return "Too many attempts. Wait a few seconds and try again.";
   }

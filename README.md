@@ -85,7 +85,7 @@ Features:
 
 - `auth`: sign-in, forgot and reset password, profile, change password, permissions
 - `dashboard`
-- `customers`, `properties` (cover, billing actions and notes), `payments`
+- `customers`, `properties` (cover: cancel renewal, end or move it; notes), `payments`
 - `messages` (contact forms), `sign-ins`
 - `staff`, `roles`
 - `locations`: countries and states for addresses
@@ -102,6 +102,7 @@ Features:
   - **Responses:** answers are `{ data }`, with `{ meta }` added to lists. Errors are `{ error: { code, message, fields } }`, except the sign-in endpoints, which answer `{ code, message }` (`src/utils/errors.ts` reads both).
   - **Forms:** show per-field errors with `showFieldErrors` (`src/utils/forms.ts`).
   - **Requests:** paths start with `/`, and no custom headers: the API's CORS allows only `Content-Type`.
+  - **Sign-in:** staff's own endpoints are under `/admin/auth`. The website's `/auth` is for customers and refuses staff.
 - **Permissions:** the menu, pages and buttons follow the signed-in role's permissions (`useAuth().can(...)`, `NAV_ITEMS` in `src/routes/navigation.tsx`). The API checks every call as well.
 - **Dates:** every date and time is shown in US Eastern time (Florida) as MM/DD/YYYY, whatever the viewer's time zone. Use `formatDate` / `formatDateTime`; the zone and formats are set in `src/config/locale.ts`.
 - **UI:** Ant Design components only. Show toasts with `App.useApp().message`. Every page starts with `PageHeader`, whose title is the page's `<h1>`.
@@ -113,12 +114,12 @@ Features:
 
 ## Authentication
 
-Staff sign in through the site's auth endpoints (`POST /auth/sign-in/email`). The session is an httpOnly cookie that scripts can't read; the panel stores no token.
+Staff have their own sign-in, separate from customers' on the website: `POST /admin/auth/sign-in/email`, and the other `/admin/auth/...` endpoints for signing out and passwords. The session is its own httpOnly cookie (`vrh_admin.session_token`) that scripts can't read; the panel stores no token. Signing in or out of the panel never touches a website login in the same browser.
 
 - **On load and after sign-in:** the panel asks `GET /admin/me` who is signed in and what their role allows.
 - **Errors:** a 401 from any call ends the session in the panel and returns to the sign-in page. A 403 means the role lacks a permission, and the page shows "No access".
-- **Staying signed in:** only `GET /auth/get-session` renews the cookie. The panel calls it on load and when it is used again after a few hours, so active staff stay signed in past the cookie's 7 days.
-- **Customer accounts:** they can't use the panel. If one signs in here, the panel signs it out again.
+- **Staying signed in:** only `GET /admin/auth/get-session` renews the cookie. The panel calls it on load and when it is used again after a few hours, so active staff stay signed in past the cookie's 7 days.
+- **Customer accounts:** the API refuses them here (403 `CUSTOMER_ACCOUNT`), and the sign-in page tells them to sign in on the website.
 
 ## Deployment
 

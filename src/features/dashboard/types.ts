@@ -11,7 +11,7 @@ export const STAT_PERIODS = [
 export type StatPeriod = (typeof STAT_PERIODS)[number]["value"];
 
 export interface DailyStats {
-  /** UTC day, "2026-11-22". */
+  /** A US Eastern calendar day, "2026-11-22". */
   date: string;
   newCustomers: number;
   newProperties: number;

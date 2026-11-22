@@ -57,10 +57,10 @@ export const theme: ThemeConfig = {
     colorLinkHover: shade(brand.blue, 0.12),
     colorLinkActive: shade(brand.blue, 0.24),
     colorTextBase: brand.ink,
-    // Hint and description text stays at 4.5:1 or better on white.
+    // Hint, description and placeholder text stays at 4.5:1 or better on white.
     colorTextTertiary: "rgba(18, 25, 28, 0.62)",
     colorTextDescription: "rgba(18, 25, 28, 0.62)",
-    colorTextPlaceholder: "rgba(18, 25, 28, 0.5)",
+    colorTextPlaceholder: "rgba(18, 25, 28, 0.62)",
     // Soft grey page background behind white cards; easier on the eyes than all-white.
     colorBgLayout: "#f4f6f8",
     borderRadius: 8,
