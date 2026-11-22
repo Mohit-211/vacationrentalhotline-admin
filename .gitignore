@@ -7,7 +7,8 @@ dist
 coverage
 *.tsbuildinfo
 
-# Local environment overrides
+# Settings: each machine keeps its own .env (see .env.example)
+.env
 .env.local
 .env.*.local
 

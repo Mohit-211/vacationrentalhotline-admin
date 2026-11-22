@@ -30,6 +30,7 @@ The data comes from the site's own API (the `vrh-frontend` app, under `/api`). `
 2. Run the panel:
 
    ```bash
+   cp .env.example .env   # once; its value points at the site on port 3000
    npm ci
    npm run dev
    ```
@@ -38,15 +39,16 @@ The data comes from the site's own API (the `vrh-frontend` app, under `/api`). `
 
 ### Environment variables
 
-`VITE_API_BASE_URL` is the site's API, without a trailing slash.
+Settings live in `.env`, one per machine. It is git-ignored, so a `git pull` never changes it. `.env.example` lists the settings with their values:
 
-| File                 | Used by                     | Value                                   |
-| -------------------- | --------------------------- | --------------------------------------- |
-| `.env.development`   | `npm run dev`               | `http://localhost:3000/api`             |
-| `.env.production`    | `npm run build`             | `https://vacationrentalhotline.com/api` |
-| `.env.local` (yours) | both, overriding the others | any other server, such as staging       |
+| Setting             | Production                              | Developing                  |
+| ------------------- | --------------------------------------- | --------------------------- |
+| `VITE_API_BASE_URL` | `https://vacationrentalhotline.com/api` | `http://localhost:3000/api` |
 
-`.env.local` is git-ignored; see `.env.example`. `VITE_*` values are built into the JavaScript sent to browsers, so never put secrets in them.
+- **Read at build time.** Vite reads `.env` when it starts the dev server or builds, and builds the values into the JavaScript. After changing a value, run `npm run build` again.
+- **The building machine counts.** If you build on one machine and upload `build/` to another, the building machine's `.env` is the one used.
+- **Checked before building.** The dev server and the build stop with a message if `VITE_API_BASE_URL` is missing or isn't a full address.
+- **No secrets.** `VITE_*` values reach every browser.
 
 ## Scripts
 
@@ -120,7 +122,7 @@ Staff sign in through the site's auth endpoints (`POST /auth/sign-in/email`). Th
 
 ## Deployment
 
-`npm run build` writes a static site to `build/`, pointing at `https://vacationrentalhotline.com/api`.
+On the server, keep a `.env` with the production value from the table above, then run `npm run build`. It writes a static site to `build/`.
 
 Serve it on a subdomain of the site, such as `https://admin.vacationrentalhotline.com`. The session cookie only works between addresses of the same site.
 
