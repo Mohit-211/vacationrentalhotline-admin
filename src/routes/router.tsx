@@ -25,24 +25,9 @@ const LEGACY_REDIRECTS: Array<[from: string, to: string]> = [
   ["editAdmin/:adminId", "/admins/:adminId/edit"],
   ["addUser", paths.newUser],
   ["viewUser/:userId", "/users/:userId"],
-  ["editUser/:userId", "/users/:userId/edit"],
-  ["role-list", paths.roles],
-  ["addRole", paths.newRole],
-  ["editRole/:roleId", "/roles/:roleId/edit"],
-  ["addService", paths.newService],
-  ["viewService/:serviceId", "/services/:serviceId"],
-  ["editService/:serviceId", "/services/:serviceId/edit"],
-  ["banner", paths.banners],
-  ["addBanner", paths.newBanner],
-  ["editBanner/:bannerId", "/banners/:bannerId/edit"],
-  ["termsAndConditions", paths.terms],
-  ["editTermsAndConditions", paths.editTerms],
-  ["aboutUs", paths.about],
-  ["editAboutUs", paths.editAbout],
   ["support", paths.contact],
   ["viewProperty/:propertyId", "/properties/:propertyId"],
   ["viewPropertyDetails/:propertyId", "/properties/:propertyId"],
-  ["loginLogs", paths.loginActivity],
   ["error401", paths.users],
 ];
 
@@ -59,8 +44,10 @@ const appRoutes: RouteObject[] = [
     path: "change-password",
     lazy: lazyPage(() => import("@/features/auth/pages/ChangePasswordPage"), "ChangePasswordPage"),
   },
-
-  { path: "users", lazy: lazyPage(() => import("@/features/users/pages/UsersPage"), "UsersPage") },
+  {
+    path: "users",
+    lazy: lazyPage(() => import("@/features/users/pages/UsersPage"), "UsersPage"),
+  },
   {
     path: "users/new",
     lazy: lazyPage(() => import("@/features/users/pages/UserCreatePage"), "UserCreatePage"),
@@ -69,11 +56,6 @@ const appRoutes: RouteObject[] = [
     path: "users/:userId",
     lazy: lazyPage(() => import("@/features/users/pages/UserDetailsPage"), "UserDetailsPage"),
   },
-  {
-    path: "users/:userId/edit",
-    lazy: lazyPage(() => import("@/features/users/pages/UserEditPage"), "UserEditPage"),
-  },
-
   {
     path: "admins",
     lazy: lazyPage(() => import("@/features/admins/pages/AdminsPage"), "AdminsPage"),
@@ -86,70 +68,6 @@ const appRoutes: RouteObject[] = [
     path: "admins/:adminId/edit",
     lazy: lazyPage(() => import("@/features/admins/pages/AdminEditPage"), "AdminEditPage"),
   },
-
-  { path: "roles", lazy: lazyPage(() => import("@/features/roles/pages/RolesPage"), "RolesPage") },
-  {
-    path: "roles/new",
-    lazy: lazyPage(() => import("@/features/roles/pages/RoleCreatePage"), "RoleCreatePage"),
-  },
-  {
-    path: "roles/:roleId/edit",
-    lazy: lazyPage(() => import("@/features/roles/pages/RoleEditPage"), "RoleEditPage"),
-  },
-
-  {
-    path: "services",
-    lazy: lazyPage(() => import("@/features/services/pages/ServicesPage"), "ServicesPage"),
-  },
-  {
-    path: "services/new",
-    lazy: lazyPage(
-      () => import("@/features/services/pages/ServiceCreatePage"),
-      "ServiceCreatePage",
-    ),
-  },
-  {
-    path: "services/:serviceId",
-    lazy: lazyPage(
-      () => import("@/features/services/pages/ServiceDetailsPage"),
-      "ServiceDetailsPage",
-    ),
-  },
-  {
-    path: "services/:serviceId/edit",
-    lazy: lazyPage(() => import("@/features/services/pages/ServiceEditPage"), "ServiceEditPage"),
-  },
-
-  {
-    path: "banners",
-    lazy: lazyPage(() => import("@/features/banners/pages/BannersPage"), "BannersPage"),
-  },
-  {
-    path: "banners/new",
-    lazy: lazyPage(() => import("@/features/banners/pages/BannerCreatePage"), "BannerCreatePage"),
-  },
-  {
-    path: "banners/:bannerId/edit",
-    lazy: lazyPage(() => import("@/features/banners/pages/BannerEditPage"), "BannerEditPage"),
-  },
-
-  {
-    path: "content/terms",
-    lazy: lazyPage(() => import("@/features/content/pages/TermsPage"), "TermsPage"),
-  },
-  {
-    path: "content/terms/edit",
-    lazy: lazyPage(() => import("@/features/content/pages/TermsEditPage"), "TermsEditPage"),
-  },
-  {
-    path: "content/about",
-    lazy: lazyPage(() => import("@/features/content/pages/AboutPage"), "AboutPage"),
-  },
-  {
-    path: "content/about/edit",
-    lazy: lazyPage(() => import("@/features/content/pages/AboutEditPage"), "AboutEditPage"),
-  },
-
   {
     path: "contact",
     lazy: lazyPage(
@@ -172,14 +90,6 @@ const appRoutes: RouteObject[] = [
       "PropertyDetailsPage",
     ),
   },
-  {
-    path: "login-activity",
-    lazy: lazyPage(
-      () => import("@/features/login-activity/pages/LoginActivityPage"),
-      "LoginActivityPage",
-    ),
-  },
-
   ...LEGACY_REDIRECTS.map(([path, to]) => ({ path, element: <LegacyRedirect to={to} /> })),
   { path: "*", Component: NotFoundPage },
 ];

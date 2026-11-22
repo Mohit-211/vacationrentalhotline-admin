@@ -1,7 +1,7 @@
 import { apiClient } from "@/api/client";
 import { toFormData } from "@/api/formData";
 import type { ApiResponse, EntityId } from "@/api/types";
-import type { NewUserValues, User, UserEditValues } from "./types";
+import type { NewUserValues, User } from "./types";
 
 /** App users are created with the API's "user" role. */
 const APP_USER_ROLE_ID = 6;
@@ -28,18 +28,6 @@ export async function createUser(values: NewUserValues): Promise<void> {
   await apiClient.post(
     "admin/user/createUser",
     toFormData({ email: values.email, name: values.name, role_id: APP_USER_ROLE_ID }),
-  );
-}
-
-export async function updateUser(userId: EntityId, values: UserEditValues): Promise<void> {
-  await apiClient.put(
-    "admin/user/updateUser",
-    toFormData({
-      user_id: userId,
-      name: values.name,
-      email: values.email,
-      subscription_status: values.subscriptionStatus ?? "",
-    }),
   );
 }
 
