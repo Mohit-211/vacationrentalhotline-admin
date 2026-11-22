@@ -1,15 +1,10 @@
 import {
-  ContactsOutlined,
-  CreditCardOutlined,
-  DashboardOutlined,
   DownOutlined,
   KeyOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuOutlined,
   MenuUnfoldOutlined,
-  SafetyCertificateOutlined,
-  TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -28,26 +23,11 @@ import { useId, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate, useNavigation } from "react-router";
 import logoMark from "@/assets/logo-mark-96.png";
 import { useAuth } from "@/features/auth/AuthContext";
-import { useProfile } from "@/features/auth/useProfile";
+import { NAV_ITEMS } from "@/routes/navigation";
 import { paths } from "@/routes/paths";
 import { layoutSizes } from "@/styles/theme";
-import { formatLabel } from "@/utils/format";
 
 const BRAND_NAME = "Vacation Rental Hotline";
-
-const NAV_ITEMS = [
-  { path: paths.dashboard, label: "Dashboard", icon: <DashboardOutlined /> },
-  { path: paths.users, label: "Users", icon: <TeamOutlined /> },
-  { path: paths.payments, label: "Payments", icon: <CreditCardOutlined /> },
-  { path: paths.contact, label: "Contact forms", icon: <ContactsOutlined /> },
-  { path: paths.admins, label: "Access management", icon: <SafetyCertificateOutlined /> },
-];
-
-const MENU_ITEMS: MenuProps["items"] = NAV_ITEMS.map((item) => ({
-  key: item.path,
-  icon: item.icon,
-  label: <Link to={item.path}>{item.label}</Link>,
-}));
 
 /** Highlights the section of the current page, including its add/edit/detail sub-pages. */
 function getSelectedKey(pathname: string): string | undefined {
@@ -75,9 +55,15 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const navigation = useNavigation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
-  const { data: profile } = useProfile();
+  const { me, can, signOut } = useAuth();
   const selectedKey = getSelectedKey(pathname);
+  const menuItems: MenuProps["items"] = NAV_ITEMS.filter((item) => can(item.permission)).map(
+    (item) => ({
+      key: item.path,
+      icon: item.icon,
+      label: <Link to={item.path}>{item.label}</Link>,
+    }),
+  );
   const showCollapsed = collapsed && !isMobile;
   const closeMenu = () => setMenuOpenOn(null);
 
@@ -91,7 +77,7 @@ export function AppLayout() {
     onClick: ({ key }) => {
       if (key === "profile") navigate(paths.profile);
       if (key === "change-password") navigate(paths.changePassword);
-      if (key === "sign-out") signOut();
+      if (key === "sign-out") void signOut();
     },
   };
 
@@ -109,7 +95,7 @@ export function AppLayout() {
       <nav aria-label="Main">
         <Menu
           mode="inline"
-          items={MENU_ITEMS}
+          items={menuItems}
           selectedKeys={selectedKey ? [selectedKey] : []}
           onClick={closeMenu}
           className="app-menu"
@@ -173,13 +159,11 @@ export function AppLayout() {
             {/* Named by its text (name and role), which stays readable to screen readers on phones. */}
             <Button type="text" className="app-account">
               <Avatar className="app-account__avatar" aria-hidden>
-                {getInitials(profile?.name)}
+                {getInitials(me?.name)}
               </Avatar>
               <span className="app-account__text">
-                <Typography.Text strong>{profile?.name ?? "Account"}</Typography.Text>
-                {profile?.admin_role?.name && (
-                  <span className="app-account__role">{formatLabel(profile.admin_role.name)}</span>
-                )}
+                <Typography.Text strong>{me?.name ?? "Account"}</Typography.Text>
+                {me?.roleLabel && <span className="app-account__role">{me.roleLabel}</span>}
               </span>
               <DownOutlined className="app-account__caret" />
             </Button>

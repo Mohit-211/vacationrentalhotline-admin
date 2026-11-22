@@ -1,36 +1,40 @@
-export const REGISTRATION_PERIODS = [
-  { value: "today", label: "Today" },
-  { value: "week", label: "This week" },
-  { value: "month", label: "This month" },
+import type { Id } from "@/api/types";
+
+/** Periods the dashboard can show, in days (the API allows 1-365). */
+export const STAT_PERIODS = [
+  { value: 7, label: "7 days" },
+  { value: 30, label: "30 days" },
+  { value: 90, label: "90 days" },
+  { value: 365, label: "12 months" },
 ] as const;
 
-export type RegistrationPeriod = (typeof REGISTRATION_PERIODS)[number]["value"];
+export type StatPeriod = (typeof STAT_PERIODS)[number]["value"];
 
-export const REVENUE_PERIODS = [
-  { value: "last 10 days", label: "Last 10 days" },
-  { value: "last 1 month", label: "Last month" },
-  { value: "last 3 months", label: "Last 3 months" },
-  { value: "last 6 months", label: "Last 6 months" },
-  { value: "last year", label: "Last year" },
-] as const;
-
-export type RevenuePeriod = (typeof REVENUE_PERIODS)[number]["value"];
-
-export interface TopPropertyOwner {
-  /** Generated client-side; the API sends no id for these rows. */
-  key: string;
-  profile_name?: string | null;
-  total_properties?: number | null;
+export interface DailyStats {
+  /** UTC day, "2026-11-22". */
+  date: string;
+  newCustomers: number;
+  newProperties: number;
+  revenueCents: number;
 }
 
-export interface CountryPropertyCount {
-  country: string;
-  property_count: number;
-}
-
-export interface RevenueBucket {
-  /** Label of the time bucket, such as a date or month. */
-  type: string;
-  totalAmount: number;
-  totalCount: number;
+/** GET /admin/stats?days=N. "new" and "period" figures cover the last N days. */
+export interface Stats {
+  days: number;
+  since: string;
+  customers: { total: number; new: number };
+  properties: {
+    total: number;
+    /** Covered now. */
+    active: number;
+    new: number;
+    activeByCountry: { countryCode: string; active: number }[];
+  };
+  /** Money received, less refunds. */
+  revenue: { totalCents: number; periodCents: number; periodPayments: number };
+  messages: { total: number; new: number };
+  /** The 5 customers with the most active properties. */
+  topCustomers: { id: Id; name: string; email: string; activeProperties: number }[];
+  /** One entry per day of the period, today included. */
+  daily: DailyStats[];
 }

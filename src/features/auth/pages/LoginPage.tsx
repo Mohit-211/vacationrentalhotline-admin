@@ -1,25 +1,28 @@
 import { useMutation } from "@tanstack/react-query";
-import { Alert, Button, Card, Form, Input, Typography } from "antd";
-import { Navigate, useLocation, type Location } from "react-router";
+import { Alert, Button, Card, Flex, Form, Input, Typography } from "antd";
+import { Link, Navigate, useLocation, type Location } from "react-router";
 import logo from "@/assets/logo-480.png";
 import { paths } from "@/routes/paths";
-import { getErrorMessage, getErrorStatus } from "@/utils/errors";
-import { login, type LoginCredentials } from "../api";
+import { getErrorCode, getErrorMessage, getErrorStatus } from "@/utils/errors";
+import { NotStaffError } from "../api";
 import { useAuth } from "../AuthContext";
+import { useLandingPath } from "../useLandingPath";
+import type { SignInValues } from "../types";
 
 interface LoginLocationState {
   from?: Location;
 }
 
 export function LoginPage() {
-  const { isAuthenticated, signIn } = useAuth();
+  const { status, signIn } = useAuth();
+  const landingPath = useLandingPath();
   const location = useLocation();
-  const loginMutation = useMutation({ mutationFn: login, onSuccess: signIn });
+  const signInMutation = useMutation({ mutationFn: signIn });
 
-  if (isAuthenticated) {
-    // Return to the page that sent the admin here; Users is the default landing page.
+  if (status === "signed-in") {
+    // Return to the page that sent the admin here, else the first page their role can open.
     const from = (location.state as LoginLocationState | null)?.from;
-    return <Navigate to={from ?? paths.users} replace />;
+    return <Navigate to={from ?? landingPath} replace />;
   }
 
   return (
@@ -38,10 +41,10 @@ export function LoginPage() {
           </Typography.Title>
           <Typography.Text type="secondary">Sign in to the admin panel</Typography.Text>
         </div>
-        <Form<LoginCredentials>
+        <Form<SignInValues>
           layout="vertical"
           requiredMark={false}
-          onFinish={(values) => loginMutation.mutate(values)}
+          onFinish={(values) => signInMutation.mutate(values)}
         >
           <Form.Item
             label="Email address"
@@ -60,11 +63,11 @@ export function LoginPage() {
           >
             <Input.Password size="large" autoComplete="current-password" />
           </Form.Item>
-          {loginMutation.isError && (
+          {signInMutation.isError && (
             <Alert
               type="error"
               showIcon
-              title={getLoginErrorMessage(loginMutation.error)}
+              title={getSignInErrorMessage(signInMutation.error)}
               className="auth-alert"
             />
           )}
@@ -73,21 +76,25 @@ export function LoginPage() {
             htmlType="submit"
             size="large"
             block
-            loading={loginMutation.isPending}
+            loading={signInMutation.isPending}
           >
             Sign in
           </Button>
+          <Flex justify="center" className="auth-footer">
+            <Link to={paths.forgotPassword}>Forgot password?</Link>
+          </Flex>
         </Form>
       </Card>
     </main>
   );
 }
 
-/** One message for unknown emails and wrong passwords, so the form does not reveal which emails exist. */
-function getLoginErrorMessage(error: unknown): string {
-  const status = getErrorStatus(error);
-  if (status !== undefined && status < 500) {
-    return "Incorrect email or password.";
+function getSignInErrorMessage(error: unknown): string {
+  if (error instanceof NotStaffError) return error.message;
+  // One message for unknown emails and wrong passwords, so the form does not reveal which exist.
+  if (getErrorCode(error) === "INVALID_EMAIL_OR_PASSWORD") return "Incorrect email or password.";
+  if (getErrorStatus(error) === 429) {
+    return "Too many attempts. Wait a few seconds and try again.";
   }
   return getErrorMessage(error, "Could not sign in. Please try again.");
 }

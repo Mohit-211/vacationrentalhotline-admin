@@ -1,9 +1,14 @@
 import { createContext, useContext } from "react";
+import type { Permission } from "./permissions";
+import type { Me, SignInValues } from "./types";
 
 export interface AuthContextValue {
-  isAuthenticated: boolean;
-  signIn: (token: string) => void;
-  signOut: () => void;
+  /** "loading" until the first check of the session cookie has answered. */
+  status: "loading" | "signed-in" | "signed-out";
+  me: Me | null;
+  can: (permission: Permission) => boolean;
+  signIn: (values: SignInValues) => Promise<Me>;
+  signOut: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

@@ -1,63 +1,81 @@
-import { EyeOutlined } from "@ant-design/icons";
-import { Button, Table, Tooltip, type TableProps } from "antd";
-import { useNavigate } from "react-router";
-import { TruncatedText } from "@/components/TruncatedText";
+import { Flex, Table, Typography, type TablePaginationConfig, type TableProps } from "antd";
+import { Link } from "react-router";
 import { paths } from "@/routes/paths";
-import { displayValue, formatDate } from "@/utils/format";
+import { formatPhone } from "@/utils/format";
 import type { Property } from "../types";
-import { SubscriptionTag } from "./SubscriptionTag";
+import { coverSummary } from "../cover";
+import { CoverTag } from "./CoverStatus";
+
+/** A property with, in lists, the customer it belongs to. */
+export type PropertyRow = Property & { customer?: { id: string; name: string; email: string } };
 
 interface PropertiesTableProps {
-  properties: Property[] | undefined;
+  properties: PropertyRow[] | undefined;
   loading?: boolean;
+  /** Show whose property each row is (the all-properties list). */
+  showCustomer?: boolean;
+  pagination?: false | TablePaginationConfig;
+  emptyText: string;
 }
 
-export function PropertiesTable({ properties, loading }: PropertiesTableProps) {
-  const navigate = useNavigate();
-
-  const columns: TableProps<Property>["columns"] = [
+export function PropertiesTable({
+  properties,
+  loading,
+  showCustomer = false,
+  pagination = false,
+  emptyText,
+}: PropertiesTableProps) {
+  const columns: TableProps<PropertyRow>["columns"] = [
+    // The address opens the property; the owner is under it.
+    {
+      title: "Property",
+      key: "property",
+      render: (_, property) => (
+        <Flex vertical className="cell-stack">
+          <Link to={paths.property(property.id)}>
+            {[property.addressLine1, property.addressLine2].filter(Boolean).join(", ")}
+          </Link>
+          <Typography.Text type="secondary">
+            {property.city}, {property.regionCode} {property.postalCode}
+          </Typography.Text>
+        </Flex>
+      ),
+    },
+    ...(showCustomer
+      ? [
+          {
+            title: "Customer",
+            key: "customer",
+            responsive: ["md" as const],
+            render: (_: unknown, property: PropertyRow) =>
+              property.customer ? (
+                <Flex vertical className="cell-stack">
+                  <Link to={paths.customer(property.customer.id)}>{property.customer.name}</Link>
+                  <Typography.Text type="secondary">{property.customer.email}</Typography.Text>
+                </Flex>
+              ) : null,
+          },
+        ]
+      : []),
+    {
+      title: "Cover",
+      key: "cover",
+      render: (_, property) => (
+        <Flex vertical align="flex-start" gap="small">
+          <CoverTag property={property} />
+          <Typography.Text type="secondary">{coverSummary(property)}</Typography.Text>
+        </Flex>
+      ),
+    },
     {
       title: "Owner",
-      dataIndex: "property_owner_name",
-      render: displayValue,
-      sorter: (a, b) => (a.property_owner_name ?? "").localeCompare(b.property_owner_name ?? ""),
-    },
-    {
-      title: "Address",
-      dataIndex: "full_address",
-      responsive: ["md"],
-      render: (address?: string | null) => <TruncatedText text={address} />,
-    },
-    {
-      title: "Subscription",
-      dataIndex: "subscription_status",
-      render: (status?: string | null) => <SubscriptionTag status={status} />,
-    },
-    {
-      title: "Starts",
-      dataIndex: "subscription_start_date",
+      key: "owner",
       responsive: ["lg"],
-      render: formatDate,
-    },
-    {
-      title: "Ends",
-      dataIndex: "subscription_end_date",
-      responsive: ["sm"],
-      render: formatDate,
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 72,
       render: (_, property) => (
-        <Tooltip title="View details">
-          <Button
-            type="text"
-            icon={<EyeOutlined />}
-            aria-label={`View property of ${property.property_owner_name ?? "unknown owner"}`}
-            onClick={() => navigate(paths.property(property.id))}
-          />
-        </Tooltip>
+        <Flex vertical>
+          {property.ownerName}
+          <Typography.Text type="secondary">{formatPhone(property.ownerPhone)}</Typography.Text>
+        </Flex>
       ),
     },
   ];
@@ -68,7 +86,8 @@ export function PropertiesTable({ properties, loading }: PropertiesTableProps) {
       columns={columns}
       dataSource={properties}
       loading={loading}
-      pagination={{ pageSize: 10, hideOnSinglePage: true }}
+      locale={{ emptyText }}
+      pagination={pagination}
       scroll={{ x: "max-content" }}
     />
   );

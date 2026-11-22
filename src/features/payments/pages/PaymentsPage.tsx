@@ -1,68 +1,88 @@
 import { ExportOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
-import { Card, Input, Table, Tag, type TableProps } from "antd";
-import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Alert, Card, Flex, Select, Table, Typography, type TableProps } from "antd";
+import { Link } from "react-router";
 import { PageHeader } from "@/components/PageHeader";
 import { QueryErrorResult } from "@/components/QueryErrorResult";
-import {
-  EMPTY_VALUE,
-  displayValue,
-  formatCurrency,
-  formatDateTime,
-  formatLabel,
-} from "@/utils/format";
-import { matchesQuery } from "@/utils/search";
+import { SearchField } from "@/components/SearchField";
+import { paths } from "@/routes/paths";
+import { EMPTY_VALUE, formatCents, formatDate, formatNumber } from "@/utils/format";
+import { useListParams } from "@/utils/useListParams";
 import { fetchPayments, paymentKeys } from "../api";
-import type { Payment } from "../types";
+import { PaymentAmount } from "../components/PaymentAmount";
+import { PaymentStatusTag } from "../components/PaymentStatusTag";
+import { PAYMENT_STATUS_OPTIONS, paymentTypeLabel } from "../status";
+import type { Payment, PaymentStatus } from "../types";
 
-/** Tag colours for the payment statuses the API sends; anything else shows as a neutral tag. */
-const STATUS_COLORS: Record<string, string> = {
-  succeeded: "success",
-  success: "success",
-  paid: "success",
-  completed: "success",
-  pending: "processing",
-  processing: "processing",
-  failed: "error",
-  canceled: "error",
-  cancelled: "error",
-  refunded: "warning",
-};
-
-function PaymentStatusTag({ status }: { status?: string | null }) {
-  if (!status) return <>{EMPTY_VALUE}</>;
-  return <Tag color={STATUS_COLORS[status.toLowerCase()]}>{formatLabel(status)}</Tag>;
-}
+const FILTERS = ["status", "customerId"] as const;
 
 const columns: TableProps<Payment>["columns"] = [
-  { title: "User", dataIndex: "user_name", render: displayValue },
+  {
+    title: "Payment",
+    key: "compact",
+    responsive: ["xs"],
+    render: (_, payment) => (
+      <Flex vertical align="flex-start" className="cell-stack">
+        <Flex align="center" gap="small">
+          <Link to={paths.payment(payment.id)}>
+            {formatCents(payment.amountCents, payment.currency)}
+          </Link>
+          <PaymentStatusTag status={payment.status} />
+        </Flex>
+        {payment.payerName}
+        <Typography.Text type="secondary">
+          {formatDate(payment.paidAt ?? payment.createdAt)}
+        </Typography.Text>
+      </Flex>
+    ),
+  },
+  {
+    title: "Date",
+    key: "date",
+    responsive: ["sm"],
+    render: (_, payment) => (
+      <Link to={paths.payment(payment.id)}>{formatDate(payment.paidAt ?? payment.createdAt)}</Link>
+    ),
+  },
+  {
+    title: "Payer",
+    key: "payer",
+    responsive: ["sm"],
+    render: (_, payment) => (
+      <Flex vertical className="cell-stack">
+        {payment.customerId ? (
+          <Link to={paths.customer(payment.customerId)}>{payment.payerName}</Link>
+        ) : (
+          payment.payerName
+        )}
+        <Typography.Text type="secondary">{payment.payerEmail}</Typography.Text>
+      </Flex>
+    ),
+  },
   {
     title: "Amount",
-    dataIndex: "collectiveAmount",
+    key: "amount",
     align: "right",
-    render: formatCurrency,
-    sorter: (a, b) => Number(a.collectiveAmount ?? 0) - Number(b.collectiveAmount ?? 0),
+    responsive: ["sm"],
+    render: (_, payment) => <PaymentAmount payment={payment} />,
   },
-  { title: "Method", dataIndex: "payment_mode", responsive: ["md"], render: formatLabel },
   {
     title: "Status",
-    dataIndex: "payment_status",
-    render: (status?: string | null) => <PaymentStatusTag status={status} />,
+    dataIndex: "status",
+    responsive: ["sm"],
+    render: (status: PaymentStatus) => <PaymentStatusTag status={status} />,
   },
   {
-    title: "Paid on",
-    dataIndex: "created_at",
-    responsive: ["sm"],
-    render: formatDateTime,
-    defaultSortOrder: "descend",
-    sorter: (a, b) => dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf(),
+    title: "Type",
+    dataIndex: "billingReason",
+    responsive: ["md"],
+    render: paymentTypeLabel,
   },
   {
     title: "Receipt",
-    dataIndex: "receipt_url",
+    dataIndex: "receiptUrl",
     responsive: ["md"],
-    render: (url?: string | null) =>
+    render: (url: string | null) =>
       url ? (
         <a href={url} target="_blank" rel="noopener noreferrer">
           View <ExportOutlined />
@@ -74,32 +94,52 @@ const columns: TableProps<Payment>["columns"] = [
 ];
 
 export function PaymentsPage() {
-  const [search, setSearch] = useState("");
-  const paymentsQuery = useQuery({ queryKey: paymentKeys.all, queryFn: fetchPayments });
-
-  const payments = useMemo(
-    () =>
-      (paymentsQuery.data ?? []).filter((payment) =>
-        matchesQuery(search, payment.user_name, payment.email),
-      ),
-    [paymentsQuery.data, search],
-  );
+  const { search, page, pageSize, filters, listParams, setSearch, setFilter, setPage } =
+    useListParams(FILTERS);
+  const params = {
+    ...listParams,
+    status: filters.status as PaymentStatus | undefined,
+    customerId: filters.customerId,
+  };
+  const paymentsQuery = useQuery({
+    queryKey: paymentKeys.list(params),
+    queryFn: () => fetchPayments(params),
+    placeholderData: keepPreviousData,
+  });
+  const filtered = Boolean(search || filters.status);
 
   return (
     <>
       <PageHeader
         title="Payments"
-        subtitle="Subscription payments made by users"
+        subtitle="Yearly cover payments, newest first. Refunds are made in Stripe and show up here."
         extra={
-          <Input.Search
-            allowClear
-            placeholder="Search user"
-            aria-label="Search payments"
-            onChange={(event) => setSearch(event.target.value)}
-            className="toolbar-search"
-          />
+          <>
+            <Select<PaymentStatus | "">
+              aria-label="Payment status"
+              value={(filters.status as PaymentStatus | undefined) ?? ""}
+              onChange={(value) => setFilter("status", value || undefined)}
+              options={[{ value: "", label: "All statuses" }, ...PAYMENT_STATUS_OPTIONS]}
+              className="toolbar-select"
+            />
+            <SearchField
+              value={search}
+              onSearch={setSearch}
+              placeholder="Search payer, email or invoice"
+              label="Search payments"
+            />
+          </>
         }
       />
+      {filters.customerId && (
+        <Alert
+          type="info"
+          showIcon
+          className="page-alert"
+          title="Showing one customer's payments."
+          action={<Link to={paths.payments}>Show all payments</Link>}
+        />
+      )}
       <Card>
         {paymentsQuery.error ? (
           <QueryErrorResult error={paymentsQuery.error} onRetry={() => paymentsQuery.refetch()} />
@@ -107,12 +147,16 @@ export function PaymentsPage() {
           <Table
             rowKey="id"
             columns={columns}
-            dataSource={payments}
-            loading={paymentsQuery.isPending}
+            dataSource={paymentsQuery.data?.data}
+            loading={paymentsQuery.isFetching}
+            locale={{ emptyText: filtered ? "No payments match" : "No payments yet" }}
             pagination={{
-              pageSize: 20,
+              current: page,
+              pageSize,
+              total: paymentsQuery.data?.meta.total,
               showSizeChanger: true,
-              showTotal: (total) => `${total} payments`,
+              showTotal: (total) => `${formatNumber(total)} payments`,
+              onChange: setPage,
             }}
             scroll={{ x: "max-content" }}
           />

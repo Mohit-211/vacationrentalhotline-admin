@@ -185,6 +185,11 @@ body {
   white-space: nowrap;
 }
 
+/* A generated password, shown once: large and easy to read back. */
+.password-box.ant-typography {
+  font-size: var(--ant-font-size-lg);
+}
+
 /* Label and value pairs, labels in the secondary text colour. */
 .detail-list {
   display: grid;
@@ -199,6 +204,13 @@ body {
 
 .detail-list dd {
   margin: 0;
+}
+
+/* Longer text in a table cell that wraps within a readable width (tables otherwise never wrap). */
+.cell-wrap {
+  display: block;
+  max-width: 360px;
+  white-space: normal;
 }
 
 /* Notes and similar short entries, one per row. */
@@ -221,6 +233,32 @@ body {
 .note-list > li:last-child {
   padding-bottom: 0;
   border-bottom: 0;
+}
+
+/* Longer text in a confirmation pop-up keeps a readable width. */
+.confirm-text {
+  max-width: 320px;
+}
+
+/* A short explanation under a card's content. */
+.card-note.ant-typography {
+  margin: var(--ant-margin) 0 0;
+}
+
+/* A notice between the page header and its content, such as an active filter. */
+.page-alert {
+  margin-bottom: var(--ant-margin);
+}
+
+/* Who wrote a note and when, under it. */
+.note-meta {
+  margin-top: var(--ant-margin-xxs);
+}
+
+/* "No customers yet" and similar messages are read, so they use the secondary text colour
+   rather than Ant Design's faint disabled one. */
+.app-content .ant-table-wrapper .ant-table-tbody > tr.ant-table-placeholder {
+  color: var(--ant-color-text-secondary);
 }
 
 /* Cards that sit side by side in a grid row stretch to the same height. */
@@ -288,6 +326,11 @@ body {
   margin-bottom: var(--ant-margin-lg);
 }
 
+/* Links under the sign-in form, such as "Forgot password?". */
+.auth-footer {
+  margin-top: var(--ant-margin);
+}
+
 /* ---------- Dashboard ---------- */
 
 .stat-card__icon {
@@ -306,6 +349,11 @@ body {
 .stat-card__icon--success {
   background: var(--ant-color-success-bg);
   color: var(--ant-color-success);
+}
+
+.stat-card__caption {
+  display: block;
+  margin-top: var(--ant-margin-xxs);
 }
 
 .stat-card__link {
@@ -372,6 +420,18 @@ body {
 
   .toolbar-search {
     width: 100%;
+  }
+
+  .cell-wrap {
+    max-width: 200px;
+  }
+
+  /* Name-over-email cells: each line is cut with "…" so tables fit the screen. */
+  .cell-stack > * {
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Tighter table cells (as in Ant Design's small tables) so key columns fit on a phone. */

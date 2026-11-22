@@ -1,6 +1,8 @@
 # Vacation Rental Hotline — Admin Panel
 
-Web admin panel for Vacation Rental Hotline: app users and their properties, payments, contact-form messages and admin access.
+Web admin panel for Vacation Rental Hotline. Staff look up and manage customers and their properties, cover and billing, payments, contact-form messages, sign-in history, staff accounts and roles.
+
+The data comes from the site's own API (the `vrh-frontend` app, under `/api`). `vrh-frontend/docs/admin-api.md` describes it. The old Node backend is retired.
 
 ## Tech stack
 
@@ -17,28 +19,40 @@ Web admin panel for Vacation Rental Hotline: app users and their properties, pay
 
 ## Getting started
 
-```bash
-npm ci
-npm run dev
-```
+1. Run the site locally on port 3000 with `ADMIN_APP_ORIGIN=http://localhost:5173` in its environment, so its API accepts this panel's requests. On a new database, create the first admin there:
 
-The dev server runs on http://localhost:3000.
+   ```bash
+   npm run admin:create -- --email you@example.com --name "Your Name"
+   ```
+
+   It prints a generated password once.
+
+2. Run the panel:
+
+   ```bash
+   npm ci
+   npm run dev
+   ```
+
+   It opens on http://localhost:5173. The port is fixed because the API only accepts the origin set in `ADMIN_APP_ORIGIN`.
 
 ### Environment variables
 
-The API address is read from `.env`, which is committed with the production value. To use a different API, create `.env.local` (it is git-ignored) with the same variable:
+`VITE_API_BASE_URL` is the site's API, without a trailing slash.
 
-```bash
-VITE_API_BASE_URL=https://staging.example.com/api/v1/
-```
+| File                 | Used by                     | Value                                   |
+| -------------------- | --------------------------- | --------------------------------------- |
+| `.env.development`   | `npm run dev`               | `http://localhost:3000/api`             |
+| `.env.production`    | `npm run build`             | `https://vacationrentalhotline.com/api` |
+| `.env.local` (yours) | both, overriding the others | any other server, such as staging       |
 
-Without an override, local development talks to the **production** API. See `.env.example`.
+`.env.local` is git-ignored; see `.env.example`. `VITE_*` values are built into the JavaScript sent to browsers, so never put secrets in them.
 
 ## Scripts
 
 | Script                                    | What it does                                           |
 | ----------------------------------------- | ------------------------------------------------------ |
-| `npm run dev`                             | Start the dev server with hot reload (port 3000)       |
+| `npm run dev`                             | Start the dev server with hot reload (port 5173)       |
 | `npm run build`                           | Type-check, then build the production site to `build/` |
 | `npm run preview`                         | Serve the production build locally                     |
 | `npm run typecheck`                       | Type-check only                                        |
@@ -49,45 +63,70 @@ Without an override, local development talks to the **production** API. See `.en
 
 ```
 src/
-  api/          HTTP client (adds the admin token, ends expired sessions), query client, shared API types
+  api/          HTTP client (cookie session, 401 handling), query client, paging helper, shared API types
   assets/       Images bundled with the app
-  components/   Shared UI: app layout, page header, form actions, delete button, truncated table text,
-                error and loading states
-  config/       Environment variables
+  components/   Shared UI: app layout, page header, search field, form actions, delete button,
+                one-time password and reset dialogs, truncated table text, error and loading states
+  config/       Environment variables, and the time zone and date formats
   features/     One folder per business area:
     <feature>/
       api.ts        The feature's endpoints and TanStack Query keys
       types.ts      Data shapes returned by the API
       components/   Components used only by this feature
       pages/        Route components, one per URL
-  routes/       Router, URL paths, sign-in guard, redirects from old URLs, 404 and error pages
+  routes/       Router, URL paths, menu, sign-in and permission guards, redirects from old URLs, 404 and error pages
   styles/       The design: theme.ts (colours, sizes, Ant Design theme) and global.css (the only stylesheet)
-  utils/        Formatting, CSV export, search and error helpers
+  utils/        Formatting, CSV export, list state in the URL, forms, errors, phone and device helpers
 ```
 
-Features: `admins` (Access Management), `auth` (sign-in, profile, password), `contact`, `dashboard`, `payments`, `properties`, `users`.
+Features:
+
+- `auth`: sign-in, forgot and reset password, profile, change password, permissions
+- `dashboard`
+- `customers`, `properties` (cover, billing actions and notes), `payments`
+- `messages` (contact forms), `sign-ins`
+- `staff`, `roles`
+- `locations`: countries and states for addresses
 
 ## Conventions
 
-- **File names:** components and pages are PascalCase (`UsersPage.tsx`) and route components end in `Page`. Other modules are camelCase (`api.ts`, `format.ts`). Feature folders are kebab-case.
-- **URLs:** kebab-case and resource-based (`/admins/:adminId/edit`). Build them with `paths` from `src/routes/paths.ts` instead of string literals. URLs from the previous version of the app redirect to their new paths (`LEGACY_REDIRECTS` in `src/routes/router.tsx`).
+- **File names:** components and pages are PascalCase (`CustomersPage.tsx`) and route components end in `Page`. Other modules are camelCase (`api.ts`, `format.ts`). Feature folders are kebab-case.
+- **URLs:** kebab-case and resource-based (`/staff/:staffId/edit`). Build them with `paths` from `src/routes/paths.ts` instead of string literals. URLs from earlier versions of the panel redirect to their new pages (`LEGACY_REDIRECTS` in `src/routes/router.tsx`).
 - **Imports:** use the `@/` alias for anything outside the current feature.
 - **Data:** components call the feature's `api.ts` functions through `useQuery` / `useMutation` with that feature's query keys; never call axios from a component.
-- **API contract:** endpoint paths, field names, and multipart vs JSON bodies match the existing API. Change them only together with the backend.
+- **Lists:** the API searches and pages them. A list's page, search and filters live in the URL (`useListParams`), so going back from a record returns to the same place.
+- **API contract** (details in `vrh-frontend/docs/admin-api.md`):
+  - **Bodies and fields:** JSON bodies, camelCase fields, UUID ids, money in cents.
+  - **Responses:** answers are `{ data }`, with `{ meta }` added to lists. Errors are `{ error: { code, message, fields } }`, except the sign-in endpoints, which answer `{ code, message }` (`src/utils/errors.ts` reads both).
+  - **Forms:** show per-field errors with `showFieldErrors` (`src/utils/forms.ts`).
+  - **Requests:** paths start with `/`, and no custom headers: the API's CORS allows only `Content-Type`.
+- **Permissions:** the menu, pages and buttons follow the signed-in role's permissions (`useAuth().can(...)`, `NAV_ITEMS` in `src/routes/navigation.tsx`). The API checks every call as well.
+- **Dates:** every date and time is shown in US Eastern time (Florida) as MM/DD/YYYY, whatever the viewer's time zone. Use `formatDate` / `formatDateTime`; the zone and formats are set in `src/config/locale.ts`.
 - **UI:** Ant Design components only. Show toasts with `App.useApp().message`. Every page starts with `PageHeader`, whose title is the page's `<h1>`.
 - **Styling:** the whole design lives in `src/styles`.
   - `theme.ts` holds every colour and size. The logo's blue and green are darkened just enough to meet WCAG AA contrast (4.5:1) and feed the Ant Design theme.
   - `global.css` is the only stylesheet. It reads those values through Ant Design's `--ant-*` CSS variables.
   - Components use its classes and never style themselves. ESLint rejects inline `style` props, hard-coded colours outside `theme.ts`, and any other stylesheet import.
-- **Small screens:** below 768px the menu moves into a drawer opened from the header. Tables drop secondary columns on narrow screens (the column `responsive` option).
+- **Small screens:** below 768px the menu moves into a drawer opened from the header. Tables drop or stack secondary columns on narrow screens, so none of them scrolls sideways.
 
 ## Authentication
 
-The admin token is kept in `localStorage` under `adminToken` and sent as the `x-access-token` header on every request (`src/api/client.ts`). The API reports an expired token as HTTP 500 "jwt expired" and a deleted admin as HTTP 403 "Admin not found."; both sign the admin out with a message. HTTP 401 means the admin's role cannot see that data, and the page shows "No access".
+Staff sign in through the site's auth endpoints (`POST /auth/sign-in/email`). The session is an httpOnly cookie that scripts can't read; the panel stores no token.
+
+- **On load and after sign-in:** the panel asks `GET /admin/me` who is signed in and what their role allows.
+- **Errors:** a 401 from any call ends the session in the panel and returns to the sign-in page. A 403 means the role lacks a permission, and the page shows "No access".
+- **Staying signed in:** only `GET /auth/get-session` renews the cookie. The panel calls it on load and when it is used again after a few hours, so active staff stay signed in past the cookie's 7 days.
+- **Customer accounts:** they can't use the panel. If one signs in here, the panel signs it out again.
 
 ## Deployment
 
-`npm run build` writes a static site to `build/`. The server must answer every path that is not a file with `index.html` (single-page-app fallback), for example:
+`npm run build` writes a static site to `build/`, pointing at `https://vacationrentalhotline.com/api`.
+
+Serve it on a subdomain of the site, such as `https://admin.vacationrentalhotline.com`. The session cookie only works between addresses of the same site.
+
+The site's server must set `ADMIN_APP_ORIGIN` to exactly that origin (scheme, host and port). Otherwise the API refuses the panel's requests.
+
+The panel's web server must answer every path that is not a file with `index.html` (single-page-app fallback), for example:
 
 - Apache: `FallbackResource /index.html`
 - nginx: `try_files $uri /index.html;`

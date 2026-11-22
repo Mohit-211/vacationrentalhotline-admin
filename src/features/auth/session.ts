@@ -1,52 +1,16 @@
 /**
- * The admin session is the API token kept in localStorage. The key is unchanged from the
- * previous app so existing sign-ins survive the upgrade.
+ * The session is an httpOnly cookie set by the API, which scripts can't read. The HTTP client
+ * reports a 401 here, and the auth provider listens so the app can return to the sign-in page.
  */
-const TOKEN_STORAGE_KEY = "adminToken";
+const listeners = new Set<() => void>();
 
-export type SessionEndReason = "signed-out" | "expired" | "deleted";
-
-const changeListeners = new Set<() => void>();
-const endListeners = new Set<(reason: SessionEndReason) => void>();
-
-export function getToken(): string | null {
-  const token = localStorage.getItem(TOKEN_STORAGE_KEY);
-  // Older builds could store the strings "undefined" or "null" after a failed login.
-  return token && token !== "undefined" && token !== "null" ? token : null;
+export function reportSessionEnded(): void {
+  listeners.forEach((listener) => listener());
 }
 
-export function startSession(token: string): void {
-  localStorage.setItem(TOKEN_STORAGE_KEY, token);
-  notifyChange();
-}
-
-export function endSession(reason: SessionEndReason): void {
-  if (getToken() === null) return;
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
-  notifyChange();
-  endListeners.forEach((listener) => listener(reason));
-}
-
-/** For useSyncExternalStore: fires on sign-in/out in this tab and in other tabs. */
-export function subscribeToToken(listener: () => void): () => void {
-  const onStorage = (event: StorageEvent) => {
-    if (event.key === TOKEN_STORAGE_KEY) listener();
-  };
-  changeListeners.add(listener);
-  window.addEventListener("storage", onStorage);
+export function onSessionEnded(listener: () => void): () => void {
+  listeners.add(listener);
   return () => {
-    changeListeners.delete(listener);
-    window.removeEventListener("storage", onStorage);
+    listeners.delete(listener);
   };
-}
-
-export function onSessionEnd(listener: (reason: SessionEndReason) => void): () => void {
-  endListeners.add(listener);
-  return () => {
-    endListeners.delete(listener);
-  };
-}
-
-function notifyChange(): void {
-  changeListeners.forEach((listener) => listener());
 }

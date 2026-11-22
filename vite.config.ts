@@ -8,8 +8,10 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  server: { port: 3000 },
-  preview: { port: 3000 },
+  // The site's API accepts this panel's requests only from the origin in its ADMIN_APP_ORIGIN
+  // (http://localhost:5173 when developing), so the port must not drift to another one.
+  server: { port: 5173, strictPort: true },
+  preview: { port: 5173, strictPort: true },
   build: {
     // Output stays in build/ (the Create React App folder) so deploy scripts keep working.
     outDir: "build",

@@ -1,9 +1,10 @@
 import { Button, Result, Typography } from "antd";
 import { useNavigate } from "react-router";
-import { paths } from "./paths";
+import { useLandingPath } from "@/features/auth/useLandingPath";
 
 export function NotFoundPage() {
   const navigate = useNavigate();
+  const landingPath = useLandingPath();
   return (
     <Result
       status="404"
@@ -14,8 +15,8 @@ export function NotFoundPage() {
       }
       subTitle="This page does not exist or has moved."
       extra={
-        <Button type="primary" onClick={() => navigate(paths.dashboard)}>
-          Go to dashboard
+        <Button type="primary" onClick={() => navigate(landingPath)}>
+          Go to the start page
         </Button>
       }
     />

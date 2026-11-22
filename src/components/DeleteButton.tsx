@@ -9,17 +9,27 @@ interface DeleteButtonProps {
   disabled?: boolean;
   /** Tooltip explaining why the button is disabled. */
   disabledReason?: string;
+  /** What deleting does, shown in the confirmation. */
+  description?: string;
+  /** Text for a labelled button, such as in a page header; without it, an icon button for tables. */
+  label?: string;
 }
 
-/** Icon button that asks for confirmation before deleting. */
+/** Delete button that asks for confirmation first. */
 export function DeleteButton({
   itemName,
   onConfirm,
   loading,
   disabled,
   disabledReason,
+  description = "This cannot be undone.",
+  label,
 }: DeleteButtonProps) {
-  const button = (
+  const button = label ? (
+    <Button danger icon={<DeleteOutlined />} loading={loading} disabled={disabled}>
+      {label}
+    </Button>
+  ) : (
     <Button
       type="text"
       danger
@@ -37,12 +47,12 @@ export function DeleteButton({
   return (
     <Popconfirm
       title={`Delete ${itemName}?`}
-      description="This cannot be undone."
+      description={<div className="confirm-text">{description}</div>}
       okText="Delete"
       okButtonProps={{ danger: true }}
       onConfirm={onConfirm}
     >
-      <Tooltip title="Delete">{button}</Tooltip>
+      {label ? button : <Tooltip title="Delete">{button}</Tooltip>}
     </Popconfirm>
   );
 }
