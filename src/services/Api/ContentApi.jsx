@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../Host";
 
 //terms and conditions
-export const GetTermsAndConditions = async (adminToken, role_id) => {
+export const GetTermsAndConditions = async (adminToken) => {
   try {
     const res = await axios.get(
       BASE_URL + "content/getAllTermsAndConditonsByAdmin",
@@ -30,7 +30,7 @@ export const UpdateTandC = async (id, formData) => {
 };
 
 //about us
-export const GetAboutUs = async (adminToken, role_id) => {
+export const GetAboutUs = async (adminToken) => {
   try {
     const res = await axios.get(BASE_URL + "content/getAllAboutUsByAdmin", {
       headers: {
@@ -52,15 +52,6 @@ export const UpdateAboutUs = async (id, formData) => {
 };
 
 //support
-export const CreateContactUs = async (formData) => {
-  return await axios.post(BASE_URL + "contactUs/createContactUs", formData, {
-    headers: {
-      "x-access-token": `${localStorage.getItem("adminToken")}`,
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-
 export const GetContactUs = async (adminToken) => {
   try {
     const res = await axios.get(BASE_URL + "contactUs/getAllContactUs", {
@@ -77,30 +68,7 @@ export const GetContactUs = async (adminToken) => {
   }
 };
 
-export const GetContactUsById = async (id) => {
-  return await axios.get(BASE_URL + `contactUs/findContactUsById/${id}`);
-};
-
-export const UpdateContactUs = async (id, formData) => {
-  return await axios.put(
-    BASE_URL + `contactUs/updateContactUs/${id}`,
-    formData,
-    {
-      headers: {
-        "x-access-token": `${localStorage.getItem("adminToken")}`,
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-};
-
-export const DeleteContactUs = async (id) => {
-  return axios.delete(BASE_URL + `contactUs/deleteContactUs/${id}`);
-};
-
-
-
-export const GetBanner = async (adminToken, role_id) => {
+export const GetBanner = async (adminToken) => {
   try {
     const res = await axios.get(BASE_URL + "content/getAllBannerImgaeByAdmin", {
       headers: {

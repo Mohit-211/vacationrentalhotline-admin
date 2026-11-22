@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Space, message } from "antd";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import Alert from "../../Customer/Alert";
 import { DeleteBanner, GetBanner } from "../../../services/Api/ContentApi";
 import { BASE_URL_IMAGE } from "../../../services/Host";

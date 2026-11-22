@@ -7,7 +7,6 @@ import { Button } from "primereact/button";
 import Form from "react-bootstrap/Form";
 import { CreateAdmin } from "../../services/Api/Api";
 import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 import { Card } from "primereact/card";
 import { message } from "antd";
 import { SolutionOutlined } from "@ant-design/icons";

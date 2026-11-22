@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { ToastContainer } from "react-toastify";
@@ -11,7 +11,6 @@ import { FaUsers } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
 import { LuSettings } from "react-icons/lu";
 import { FaRegCircleUser } from "react-icons/fa6";
-import { MdAddHomeWork } from "react-icons/md";
 import { CiLogin } from "react-icons/ci";
 import { Layout, theme, Menu } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -30,9 +29,6 @@ const MainLayout = () => {
 	const getData = async () => {
 		try {
 		  let result = await GetAdminProfile(localStorage.getItem("adminToken"));
-	
-		  // Log the entire result to understand its structure
-		  console.log(result);
 	
 		  // Check if the request was successful and set data
 		  if (result.status === 200) {
@@ -115,12 +111,7 @@ const MainLayout = () => {
 							theme="dark"
 							mode="inline"
 							defaultSelectedKeys={[""]}
-							onClick={({ key }) => {
-								if (key === "signout") {
-								} else {
-									navigate(key);
-								}
-							}}
+							onClick={({ key }) => navigate(key)}
 							items={[
 								{
 									key: "/",
@@ -132,11 +123,6 @@ const MainLayout = () => {
 									icon: <FaUsers className="fs-4" />,
 									label: "Users",
 								},
-								// {
-								// 	key: "/properties",
-								// 	icon: <MdAddHomeWork className="fs-4" />,
-								// 	label: "Property",
-								// },
 								{
 									key: "/payments",
 									icon: <IoIosPricetags className="fs-4" />,
@@ -173,10 +159,6 @@ const MainLayout = () => {
 								}
 							)}
 							<div className="d-flex gap-4 align-items-center">
-								{/* <div className="position-relative clicked">
-									<FiMail className="fs-3" onClick={handleMailClick} />
-								</div> */}
-
 								<div className="vertical-line"></div>
 								<div className="position-relative">
 									<div className="d-flex align-items-center">
@@ -200,7 +182,6 @@ const MainLayout = () => {
 											className="dropdown-menu admin"
 											aria-labelledby="dropdownMenuLink"
 											style={{
-												// margin: "10px !important",
 												borderTopColor: "purple",
 												borderTopWidth: "4px",
 											}}
@@ -225,16 +206,6 @@ const MainLayout = () => {
 													Change Password
 												</Link>
 											</li>
-											{/* <li>
-												<Link
-													className="dropdown-item py-1 mb-1"
-													style={{ height: "auto", lineHeight: "30px" }}
-													to="/loginLogs"
-												>
-													<FiActivity style={{ marginRight: "10px" }} />
-													User Login Activity
-												</Link>
-											</li> */}
 											<div className="dropdown-divider"></div>
 											<li>
 												<Link

@@ -1,20 +1,17 @@
-import React, { useLayoutEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import { Card } from "antd";
 import { Form, Input, message } from "antd";
-import { Editor } from "@tinymce/tinymce-react";
 import { Button } from "primereact/button";
 import { UpdateTandC } from "../../../services/Api/ContentApi";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const EditTermsAndConditions = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { data } = location.state;
-  console.log("cardadta==>", data, data.id);
   const [contentData, setContentData] = useState({
     heading: data?.heading || "",
     description: data?.description || "",

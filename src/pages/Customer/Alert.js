@@ -15,10 +15,6 @@ const Alert = ({ handleDelete, title }) => {
 
       onOk() {
         handleDelete(); // Call the handleDelete function provided via props
-        // console.log('OK');
-      },
-      onCancel() {
-        // console.log('Cancel');
       },
     });
   };

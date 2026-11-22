@@ -15,9 +15,6 @@ import { GetBannerById, UpdateBanner } from "../../../services/Api/ContentApi";
 const EditBanner = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const [serviceData, setServiceData] = useState({
-		banners: [],
-	});
 	const [images, setImages] = useState([]);
 	const [imagePreviews, setImagePreviews] = useState([]);
 	const [removeImageIds, setRemoveImageIds] = useState([]);
@@ -25,8 +22,6 @@ const EditBanner = () => {
 	useLayoutEffect(() => {
 		GetBannerById(id)
 			.then((res) => {
-				setServiceData(res.data.data);
-				console.log(serviceData, "banner");
 				if (
 					res.data.data.banners &&
 					res.data.data.banners.length > 0
@@ -55,10 +50,6 @@ const EditBanner = () => {
 		setImagePreviews(null);
 		setRemoveImageIds(null);
 		document.getElementById("imageInput").value = "";
-	};
-
-	const onChange = (e) => {
-		setServiceData({ ...serviceData, [e.target.name]: e.target.value });
 	};
 
 	const handleSubmit = (e) => {
@@ -106,49 +97,6 @@ const EditBanner = () => {
 			<Card style={{ width: "100%" }}>
 				<Form>
 					<Row>
-						{/* <Form.Group className="mb-3">
-							<Form.Label>Images:</Form.Label>
-							<Form.Control
-								type="file"
-								name="images"
-								accept="image/*"
-								id="imageInput"
-								onChange={handleImageChange}
-								
-							/>
-							{imagePreviews.map((preview, index) => (
-								<div
-									key={index}
-									style={{
-										border: "1px solid #ccc",
-										borderRadius: "5px",
-										padding: "10px",
-										marginBottom: "10px",
-										marginTop: "20px",
-									}}
-								>
-									<div style={{ display: "flex", alignItems: "center" }}>
-										<img
-											src={preview}
-											alt={`Preview ${index}`}
-											crossOrigin="anonymous"
-											style={{
-												height: "80px",
-												width: "80px",
-												marginRight: "10px",
-											}}
-										/>
-										<DeleteIcon
-											fontSize="large"
-											color="warning"
-											style={{ marginLeft: "auto", cursor: "pointer" }}
-											onClick={() => handleRemoveImage(index)}
-										/>
-									</div>
-								</div>
-							))}
-						</Form.Group> */}
-
 <Form.Group className="mb-3">
 								<Form.Label>Image:</Form.Label>
 								<Form.Control

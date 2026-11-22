@@ -1,5 +1,4 @@
 .page-title {
-  /* font-family: open sans; */
   margin: 0;
   color: #1a1a1a;
   font-size: 25px;
@@ -12,9 +11,4 @@
   font-size: 15px;
   text-transform: none;
   font-weight: 400;
-}
-
-.saving_buttons {
-  text-align: right;
-  width: 100%;
 }

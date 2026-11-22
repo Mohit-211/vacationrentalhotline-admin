@@ -1,14 +1,13 @@
 import { Box } from "@mui/material";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect } from "react";
 import { Form } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GetAdminProfile } from "../../services/Api/Api.jsx";
 
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 
 const ViewAdmin = () => {
-  const { id } = useParams();
   const [idData, setIdData] = React.useState({});
 
   //get admin profile
@@ -65,16 +64,6 @@ const ViewAdmin = () => {
                 disabled
               />
             </Form.Group>
-
-            {/* <Form.Group className="mb-3">
-              <Form.Label>Department</Form.Label>
-              <Form.Control
-                type="text"
-                defaultValue={idData?.admin_department?.name || ""}
-                name="abbreviation"
-                disabled
-              />
-            </Form.Group> */}
           </Form>
           <div className="button">
             <Button

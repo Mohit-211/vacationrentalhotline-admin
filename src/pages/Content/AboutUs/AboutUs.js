@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./AddAboutUs";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { GetAboutUs } from "../../../services/Api/ContentApi";
@@ -14,7 +13,6 @@ const AboutUs = () => {
       setLoading(true);
       let result = await GetAboutUs(localStorage.getItem("adminToken"));
       setContentData(result.data.data);
-      console.log("GetAboutUs==>", result.data.data);
     } catch (e) {
       console.log(e);
       if (e.response && e.response.status === 401) {
@@ -51,8 +49,6 @@ const AboutUs = () => {
             style={{ position: "relative", padding: "12px 0px 12px 12px " }}
           >
             <div>
-              {/* <h2>{contentData[0]?.heading}</h2> */}
-              {/* <p>{contentData[0]?.description}</p> */}
               <p
                 dangerouslySetInnerHTML={{
                   __html: contentData[0]?.description,
@@ -64,7 +60,6 @@ const AboutUs = () => {
                 label=" Edit About Us"
                 icon="pi pi-pencil"
                 severity="info"
-                // onClick={navigateToEditTAndC}
                 onClick={() => {
                   navigate("/editAboutUs", {
                     state: { data: content },

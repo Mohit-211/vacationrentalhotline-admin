@@ -25,7 +25,6 @@ const AdminUser = () => {
 			setLoading(true);
 			let result = await GetAdmins(localStorage.getItem("adminToken"));
 			setRoleData(result.data.data);
-			console.log("admins", result.data.data);
 		} catch (e) {
 			console.log(e);
 			if (e.response && e.response.status === 401) {

@@ -6,7 +6,6 @@ import Form from "react-bootstrap/Form";
 import { CreateRole } from "../../services/Api/Api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Card } from "primereact/card";
 
 const AddRole = () => {
@@ -95,7 +94,6 @@ const AddRole = () => {
                   borderRadius: "10px",
                   marginLeft: "10px",
                   marginTop: "10px",
-                  // width:"10px"
                 }}
               >
                 Save

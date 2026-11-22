@@ -67,7 +67,6 @@ function Row(props) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell>User user_id</TableCell> */}
                     <TableCell >Ip address</TableCell>
                     <TableCell align="right">Login Time</TableCell>
                     <TableCell align="right">Logout Time</TableCell>
@@ -76,7 +75,6 @@ function Row(props) {
                 <TableBody>
                   {row.map((historyRow) => (
                     <TableRow key={historyRow.id}>
-                      {/* <TableCell align="right">{row[0].user_id}</TableCell> */}
                       <TableCell >
                         {row[0].ip_address.split(":").pop()}
                       </TableCell>
@@ -134,7 +132,6 @@ const LoginLogs = () => {
       try {
         let data = await getUserLoginTimings();
         setUserLoginTimingData(data.data.data);
-        console.log("logs", data.data);
       } catch (error) {
         setError(error.message)
       }

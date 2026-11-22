@@ -5,7 +5,7 @@ import { Table } from "antd";
 import { GetPayments } from "../../services/Api/Api";
 import { useNavigate } from "react-router";
 import { InputText } from "primereact/inputtext";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import moment from "moment/moment";
 
 const Payment = () => {
@@ -33,11 +33,6 @@ const Payment = () => {
 			dataIndex: "user_name",
 			width: "20%",
 		},
-		// {
-		// 	title: "Subscription Plan",
-		// 	dataIndex: ["plan_payments", "name"],
-		// 	width: "20%",
-		// },
         {
 			title: "Amount Paid",
 			dataIndex: "collectiveAmount",
@@ -69,12 +64,6 @@ const Payment = () => {
 			dataIndex: "payment_status",
 			width: "20%",
 		},
-		// {
-		// 	title: "Days Left",
-		// 	dataIndex: ["payment_users", "no_of_days_left_for_subscription"],
-        //     render: (days) => (days === null ? "---" : days),
-		// 	width: "20%",
-		// },
 	];
 
 	// Get all users

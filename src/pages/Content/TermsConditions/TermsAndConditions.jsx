@@ -16,7 +16,6 @@ const TermsAndConditions = () => {
         localStorage.getItem("adminToken")
       );
       setContentData(result.data.data);
-      console.log("GetTermsAndConditions==>", result.data.data);
     } catch (e) {
       console.log(e);
       if (e.response && e.response.status === 401) {
@@ -34,9 +33,6 @@ const TermsAndConditions = () => {
     getData();
   }, []);
 
-  const navigateToEditTAndC = (event, id) => {
-    navigate(`/editTermsAndConditions/${id}`);
-  };
   return (
     <div className="main_tc_container">
       {loading ? (
@@ -64,7 +60,6 @@ const TermsAndConditions = () => {
             >
               <div>
                 <h2>{contentData[0]?.heading}</h2>
-                {/* <p>{contentData[0]?.description}</p> */}
                 <p
                   dangerouslySetInnerHTML={{
                     __html: contentData[0]?.description,
@@ -76,7 +71,6 @@ const TermsAndConditions = () => {
                   label=" Edit T&C"
                   icon="pi pi-pencil"
                   severity="info"
-                  // onClick={navigateToEditTAndC}
                   onClick={() => {
                     navigate("/editTermsAndConditions", {
                       state: { data: content },

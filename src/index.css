@@ -16,9 +16,6 @@ body {
 
 
 .logo {
-  height: 32px;
-  margin: 16px;
-  background: rgba(255, 255, 255, 0.3);
   background-color: #0870B1 !important;
   margin: 0;
   height: 64px;
@@ -71,12 +68,4 @@ main::-webkit-scrollbar {
 .ant-layout-header p {
   line-height: 20px;
   font-size: 13px;
-}
-.ant-layout-header div .badge {
-  top: 16px;
-  right: -6px;
-}
-.error {
-  color: red;
-  font-size: 12px;
 }

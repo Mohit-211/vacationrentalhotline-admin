@@ -25,11 +25,9 @@ const EditAdmin = () => {
 				console.log(err, "error");
 			});
 	}, [id]);
-	console.log("isdata---->", idData);
 
 	//update role api implementation
 	const handleNameChange = (e) => {
-		console.log("Selected value:", e.target.value);
 		setIdData({ ...idData, [e.target?.name]: e.target?.value });
 	};
 
@@ -40,7 +38,6 @@ const EditAdmin = () => {
 		formData.append("name", idData?.name ? idData?.name : "");
 		formData.append("email", idData?.email ? idData?.email : "");
 		formData.append("role_id", idData?.role_id ? idData?.role_id : "");
-		console.log("formData", formData);
 		UpdateAdmin(formData)
 			.then((res) => {
 				if (res.status === 200) {

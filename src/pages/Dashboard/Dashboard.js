@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Column, Pie } from "@ant-design/plots";
+import { Column } from "@ant-design/plots";
 import "./Dashboard.css";
 import { Select, Spin, Table } from "antd";
 import { Button } from "primereact/button";
@@ -51,7 +51,6 @@ const Dashboard = () => {
 		try {
 			const result = await GetUserCount(localStorage.getItem("adminToken"));
 			setCustomerData(result.data.data);
-			console.log("customerdata====>", customerData);
 		} catch (e) {
 			console.log(e);
 		}
@@ -63,7 +62,6 @@ const Dashboard = () => {
 				localStorage.getItem("adminToken")
 			);
 			setPropertyData(result.data.data);
-			console.log("customerdata====>", customerData);
 		} catch (e) {
 			console.log(e);
 		}
@@ -84,7 +82,6 @@ const Dashboard = () => {
 		try {
 			const result = await GetTotalRevenue(localStorage.getItem("adminToken"));
 			setRevenueData(result.data.data);
-			console.log("customerdata====>", customerData);
 		} catch (e) {
 			console.log(e);
 		}
@@ -503,7 +500,6 @@ const Dashboard = () => {
 								display: "flex",
 								flexDirection: "column",
 								alignItems: "center",
-								// padding: "10px",
 							}}
 						>
 							{propertyCountByCountryData.map((item) => (

@@ -5,7 +5,7 @@ import { Table } from "antd";
 import { GetProperties } from "../../services/Api/Api";
 import { useNavigate } from "react-router";
 import { InputText } from "primereact/inputtext";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import { IoArrowForwardCircleOutline } from "react-icons/io5";
 import { Button } from "primereact/button";
 

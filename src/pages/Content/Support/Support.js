@@ -1,11 +1,11 @@
 /** @format */
 
 import React, { useEffect, useState } from "react";
-import { Table, message } from "antd";
-import { GetContactUs, DeleteContactUs } from "../../../services/Api/ContentApi";
+import { Table } from "antd";
+import { GetContactUs } from "../../../services/Api/ContentApi";
 import { useNavigate } from "react-router";
 import { InputText } from "primereact/inputtext";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import moment from "moment/moment";
 
 const Support = () => {
@@ -54,27 +54,6 @@ const Support = () => {
       width: "30%",
       render: (date) => moment(date).format("YYYY-MM-DD HH:mm:ss"),
     },
-    // {
-    //   title: "Actions",
-    //   dataIndex: "actions",
-    //   width: "20%",
-    //   render: (_, record) => (
-    //     <div>
-    //       <Button
-    //         icon="pi pi-pencil"
-    //         rounded
-    //         outlined
-    //         className="mr-2"
-    //         style={{ marginRight: "10px", borderRadius: "25px" }}
-    //         onClick={() => navigate(`/editSupport/${record.id}`)}
-    //       />
-    //       <Alert
-    //         title="Data"
-    //         handleDelete={() => removeUser(record.id)}
-    //       />
-    //     </div>
-    //   ),
-    // },
   ];
 
   // Get all support queries
@@ -126,17 +105,6 @@ const Support = () => {
       item.email.toLowerCase().includes(searchField.toLowerCase())
     );
     setData(searchList);
-  };
-
-  const removeUser = (user_id) => {
-    DeleteContactUs(user_id, localStorage.getItem("adminToken"))
-      .then((res) => {
-        message.success(res?.data?.message);
-        getData();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   return (

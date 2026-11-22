@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";

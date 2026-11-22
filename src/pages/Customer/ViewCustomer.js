@@ -22,7 +22,6 @@ const ViewCustomer = () => {
 		GetUserById(id)
 			.then((res) => {
 				setUserData(res.data.data);
-				console.log("user", res.data.data);
 			})
 			.catch((err) => {
 				console.log(err, "error");

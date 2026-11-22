@@ -11,7 +11,6 @@ import { message } from "antd";
 const AddCustomer = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [roleId, setRoleId] = useState("");
   const [disable, setDisable] = useState(false);
   const navigate = useNavigate();
 

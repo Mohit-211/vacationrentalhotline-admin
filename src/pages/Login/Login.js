@@ -42,17 +42,12 @@ const Login = () => {
       });
   };
 
-  const onFinishFailed = (errorInfo) => {};
-
   return (
     <div className="LoginContainer">
       <div className="Login">
         <div className="Login_Container">
           <div className="LogoContainer">
             <img src={logo} alt="Logo" className="Logo" />
-            {/* <h1 style={{ marginBottom: "10px", marginLeft: "10px" }}>
-            Mobile Pool 
-            </h1> */}
           </div>
           <div className="heading_two_content">
             <h2 className="heading_2">Hi, Welcome Back</h2>
@@ -64,11 +59,7 @@ const Login = () => {
           <Form
             name="basic"
             layout="vertical"
-            initialValues={{
-              remember: true,
-            }}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <Form.Item

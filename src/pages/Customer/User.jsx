@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import { DeleteUser, GetUsers } from "../../services/Api/Api";
 import { useNavigate } from "react-router";
 import { InputText } from "primereact/inputtext";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 import Alert from "./Alert";
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'; 
 
@@ -13,7 +13,6 @@ const User = () => {
   const [data, setData] = useState([]);
   const [userBackupData, setUserBackupData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [tableParams, setTableParams] = useState({
     pagination: {
       current: 1,
@@ -50,11 +49,6 @@ const User = () => {
         </div>
       ),
     },
-    // {
-    //   title: "Email",
-    //   dataIndex: "email",
-    //   width: "30%",
-    // },
     {
       title: "Mobile",
       dataIndex: ["user_profile", "mobile"],
@@ -157,7 +151,6 @@ const User = () => {
   };
 
   const removeUser = async (user_id) => {
-    setIsModalVisible(false);
     try {
       let res = await DeleteUser(user_id, localStorage.getItem("adminToken"));
       message.success(res?.data?.message);
@@ -196,10 +189,6 @@ const User = () => {
 
   const navigateToViewUser = (event, id) => {
     navigate(`/viewUser/${id}`);
-  };
-
-  const navigateToEditUser = (event, id) => {
-    navigate(`/editUser/${id}`);
   };
 
   return (
