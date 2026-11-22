@@ -1,0 +1,153 @@
+/** @format */
+
+.dashboard_title {
+  margin-bottom: 0px !important;
+}
+
+.left_graph {
+  width: 70%;
+  margin-top: 10px;
+  padding: 1.5rem;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  margin-right: 10px;
+
+}
+
+.right_graph {
+  width: 30%;
+  margin-top: 10px;
+  padding:1.5rem;
+  border: 1px solid #e7e7e7;
+  border-radius: 10px;
+  text-align: center;
+  /* margin-bottom: 20px; */
+}
+
+.headingTitle{
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: black;
+}
+
+.scrollable-table-container {
+  max-height: 220px; /* Adjust this value as needed */
+  overflow-y: auto;
+}
+
+.card-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 80%
+}
+
+.small-card {
+  flex: 1;
+}
+
+.large-card {
+  flex: 2; /* Takes up the space of two small cards */
+}
+
+.percentage {
+  font-size: 0.9em;
+  margin-top: 10px;
+}
+
+.positive {
+  color: green;
+}
+
+.negative {
+  color: red;
+}
+
+.graph-placeholder {
+  background: linear-gradient(to top right, #FFD700, #FFAA00);
+  height: 60px; /* Placeholder for a graph or image */
+  margin-top: 20px;
+  border-radius: 4px;
+}
+
+
+.spinner-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999; /* Ensure it overlays everything */
+}
+
+.revenue-card {
+  width: 30% !important;
+  background: #f5f5f5; /* Light grey background */
+  background: linear-gradient(145deg, #ffffff, #e0e0e0); /* Soft gradient */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Softer, deeper shadow */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.revenue-card:hover {
+	transform: translateY(-5px); /* Hover effect for lift */
+}
+
+.revenue-card-content {
+	display: flex;
+	align-items: center;
+}
+
+.icon-container {
+	width: 40px;
+	height: 40px;
+	background-color: #e8f5e9; /* Light green background for icon */
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 15px;
+}
+
+.revenue-info {
+	display: flex;
+	flex-direction: column;
+}
+
+.revenue-desc {
+	font-size: 16px;
+	color: #555;
+	margin: 0;
+	font-weight: 500;
+}
+
+.revenue-amount {
+	font-size: 24px;
+	color: #4CAF50;
+	margin: 5px 0 0 0;
+	font-weight: bold;
+}
+
+.headingTitle{
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: black;
+}
+
+.scrollable-table-container {
+  max-height: 220px; /* Adjust this value as needed */
+  overflow-y: auto;
+}
+
