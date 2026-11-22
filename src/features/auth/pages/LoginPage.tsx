@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Alert, Button, Card, Form, Input, Typography } from "antd";
 import { Navigate, useLocation, type Location } from "react-router";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-480.png";
 import { paths } from "@/routes/paths";
 import { getErrorMessage, getErrorStatus } from "@/utils/errors";
 import { login, type LoginCredentials } from "../api";
@@ -26,7 +26,13 @@ export function LoginPage() {
   return (
     <main className={styles.page}>
       <Card className={styles.card}>
-        <img src={logo} alt="Vacation Rental Hotline" className={styles.logo} />
+        <img
+          src={logo}
+          alt="Vacation Rental Hotline"
+          width={240}
+          height={90}
+          className={styles.logo}
+        />
         <div className={styles.heading}>
           <Typography.Title level={3} style={{ marginBottom: 4 }}>
             Welcome back

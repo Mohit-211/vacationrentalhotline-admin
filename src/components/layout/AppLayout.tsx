@@ -23,7 +23,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate, useNavigation } from "react-router";
-import logoMark from "@/assets/logo-mark.png";
+import logoMark from "@/assets/logo-mark-96.png";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useProfile } from "@/features/auth/useProfile";
 import { paths } from "@/routes/paths";
